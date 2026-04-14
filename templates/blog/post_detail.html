@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block meta_description %}{{ post.excerpt|truncatechars:155 }}{% endblock %}
+
+{% block content %}
+<article class="max-w-6xl mx-auto px-6">
+
+  <!-- ── Article Header ──────────────────────────────────────────────────── -->
+  <header class="pt-12 pb-8 border-b border-ink-200 max-w-3xl">
+
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 font-mono text-xs tracking-wider uppercase text-ink-400 mb-6">
+      <a href="{% url 'blog:home' %}" class="hover:text-ink-900 transition-colors">Home</a>
+      <span>›</span>
+      {% if post.category %}
+      <a href="{{ post.category.get_absolute_url }}" class="hover:text-ink-900 transition-colors">
+        {{ post.category.name }}
+      </a>
+      <span>›</span>
+      {% endif %}
+      <span class="text-ink-600">{{ post.title|truncatechars:40 }}</span>
+    </div>
+
+    <!-- Category + AI badge -->
+    <div class="flex items-center gap-3 mb-4 flex-wrap">
+      {% if post.category %}
+      <a href="{{ post.category.get_absolute_url }}"
+         class="font-mono text-xs tracking-[0.2em] uppercase text-ink-900 border border-ink-900 px-2 py-1 hover:bg-ink-900 hover:text-ink-50 transition-colors">
+        {{ post.category.name }}
+      </a>
+      {% endif %}
+      {% if post.is_ai_generated %}
+      <span class="ai-badge">✦ AI-Assisted Draft</span>
+      {% endif %}
+    </div>
+
+    <!-- Title -->
+    <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-black leading-tight text-ink-950 mb-6">
+      {{ post.title }}
+    </h1>
+
+    <!-- Excerpt / standfirst -->
+    {% if post.excerpt %}
+    <p class="font-body text-xl text-ink-600 leading-relaxed italic border-l-4 border-ink-900 pl-4">
+      {{ post.excerpt }}
+    </p>
+    {% endif %}
+
+    <!-- Byline -->
+    <div class="flex items-center gap-6 mt-6 pt-6 border-t border-ink-200">
+      <div>
+        <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-0.5">Author</p>
+        <p class="font-body text-sm font-medium text-ink-800">
+          {% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% else %}The Editors{% endif %}
+        </p>
+      </div>
+      <div class="h-8 w-px bg-ink-200"></div>
+      <div>
+        <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-0.5">Published</p>
+        <p class="font-body text-sm text-ink-700">{{ post.published_at|date:"F j, Y" }}</p>
+      </div>
+      <div class="h-8 w-px bg-ink-200"></div>
+      <div>
+        <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-0.5">Reading Time</p>
+        <p class="font-body text-sm text-ink-700">{{ post.reading_time }} min</p>
+      </div>
+      <div class="h-8 w-px bg-ink-200"></div>
+      <div>
+        <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-0.5">Views</p>
+        <p class="font-body text-sm text-ink-700">{{ post.views }}</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Cover Image ───────────────────────────────────────────────────────── -->
+  {% if post.cover_image %}
+  <div class="my-10 max-w-3xl">
+    <img src="{{ post.cover_image.url }}" alt="{{ post.title }}"
+         class="w-full grayscale object-cover" />
+  </div>
+  {% endif %}
+
+  <!-- ── Two-column layout: body + sidebar ─────────────────────────────────── -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 py-10">
+
+    <!-- ── Article Body ────────────────────────────────────────────────────── -->
+    <div class="lg:col-span-8">
+      <div class="prose-stigma text-base leading-relaxed">
+        {{ post.formatted_body|safe }}
+      </div>
+
+      <!-- Tags -->
+      {% with post.tags.all as tag_list %}
+      {% if tag_list %}
+      <div class="mt-10 pt-6 border-t border-ink-200">
+        <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-3">Filed under</p>
+        <div class="flex flex-wrap gap-2">
+          {% for tag in tag_list %}
+          <a href="{% url 'blog:tag' tag.slug %}"
+             class="font-mono text-xs text-ink-600 border border-ink-300 px-3 py-1 hover:border-ink-900 hover:text-ink-900 transition-colors">
+            #{{ tag.name }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- ── Sidebar ────────────────────────────────────────────────────────── -->
+    <aside class="lg:col-span-4">
+      <div class="sticky top-8 space-y-8">
+
+        <!-- Related posts -->
+        {% if related_posts %}
+        <div class="border border-ink-200 p-5">
+          <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-4 border-b border-ink-200 pb-3">
+            Further Reading
+          </p>
+          <ul class="space-y-5">
+            {% for rp in related_posts %}
+            <li class="border-b border-ink-100 pb-5 last:border-0 last:pb-0">
+              <a href="{{ rp.get_absolute_url }}"
+                 class="block group">
+                <p class="font-body text-sm font-medium text-ink-800 group-hover:text-ink-500 transition-colors leading-snug mb-1">
+                  {{ rp.title }}
+                </p>
+                <p class="font-mono text-xs text-ink-400">{{ rp.published_at|date:"N j, Y" }} · {{ rp.reading_time }} min</p>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        <!-- Share / actions -->
+        <div class="border border-ink-200 p-5">
+          <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-4">Share</p>
+          <div class="space-y-2">
+            <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.build_absolute_uri }}"
+               target="_blank" rel="noopener"
+               class="block text-sm font-body text-ink-600 hover:text-ink-900 transition-colors">
+              → Share on X / Twitter
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ post.title|urlencode }}"
+               target="_blank" rel="noopener"
+               class="block text-sm font-body text-ink-600 hover:text-ink-900 transition-colors">
+              → Share on LinkedIn
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+  </div>
+
+  <!-- ── Comments ──────────────────────────────────────────────────────────── -->
+  <section class="max-w-3xl border-t border-ink-200 pt-12 pb-16">
+    <div class="masthead-rule mb-8"></div>
+
+    <h2 class="font-display text-3xl font-bold text-ink-900 mb-8">
+      Discussion
+      {% if comments %}
+      <span class="font-mono text-base font-normal text-ink-400 ml-2">({{ comments|length }})</span>
+      {% endif %}
+    </h2>
+
+    <!-- Existing comments -->
+    {% if comments %}
+    <div class="space-y-8 mb-12">
+      {% for comment in comments %}
+      <div class="border-l-2 border-ink-200 pl-5">
+        <div class="flex items-baseline gap-3 mb-2">
+          <span class="font-body font-semibold text-ink-900 text-sm">{{ comment.author_name }}</span>
+          <span class="font-mono text-xs text-ink-400">{{ comment.created_at|date:"N j, Y · g:i A" }}</span>
+        </div>
+        <p class="font-body text-sm text-ink-600 leading-relaxed">{{ comment.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="font-body text-ink-400 italic mb-10">No comments yet. Be the first to share your thoughts.</p>
+    {% endif %}
+
+    <!-- Comment form -->
+    <div class="border border-ink-200 p-6 md:p-8">
+      <h3 class="font-display text-xl font-bold text-ink-900 mb-6">Leave a Comment</h3>
+      <form method="post" action="{{ request.path }}" class="space-y-5">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block font-mono text-xs tracking-wider uppercase text-ink-500 mb-2">
+              {{ comment_form.author_name.label }}
+            </label>
+            {{ comment_form.author_name }}
+          </div>
+          <div>
+            <label class="block font-mono text-xs tracking-wider uppercase text-ink-500 mb-2">
+              {{ comment_form.author_email.label }}
+            </label>
+            {{ comment_form.author_email }}
+          </div>
+        </div>
+        <div>
+          <label class="block font-mono text-xs tracking-wider uppercase text-ink-500 mb-2">
+            {{ comment_form.body.label }}
+          </label>
+          {{ comment_form.body }}
+        </div>
+        <p class="font-mono text-xs text-ink-400">Comments are moderated and will appear after approval.</p>
+        <button type="submit"
+                class="font-mono text-xs tracking-widest uppercase bg-ink-950 text-ink-50 px-6 py-3 hover:bg-ink-700 transition-colors">
+          Submit Comment →
+        </button>
+      </form>
+    </div>
+  </section>
+
+</article>
+{% endblock %}

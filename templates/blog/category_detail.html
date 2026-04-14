@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12">
+  <div class="border-b border-ink-200 pb-6 mb-10">
+    <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-2">Category</p>
+    <h1 class="font-display text-4xl font-black text-ink-950">{{ category.name }}</h1>
+    {% if category.description %}
+    <p class="font-body text-ink-500 mt-3 max-w-xl">{{ category.description }}</p>
+    {% endif %}
+    <p class="font-mono text-xs text-ink-400 mt-2">{{ page.paginator.count }} post{{ page.paginator.count|pluralize }}</p>
+  </div>
+
+  {% if page.object_list %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink-200">
+    {% for post in page.object_list %}
+    <article class="post-card bg-ink-50 p-6 md:p-8 flex flex-col">
+      <p class="font-mono text-xs text-ink-400 mb-3">{{ post.published_at|date:"N j, Y" }}</p>
+      <h2 class="font-display text-xl font-bold text-ink-900 leading-snug mb-3 flex-1">
+        <a href="{{ post.get_absolute_url }}" class="hover:text-ink-500 transition-colors">
+          {{ post.title }}
+        </a>
+      </h2>
+      <p class="font-body text-sm text-ink-500 leading-relaxed mb-4 line-clamp-2">
+        {{ post.excerpt|truncatewords:18 }}
+      </p>
+      <div class="flex items-center justify-between pt-4 border-t border-ink-200 mt-auto">
+        <span class="font-mono text-xs text-ink-400">{{ post.author.get_full_name|default:post.author.username }}</span>
+        <span class="font-mono text-xs text-ink-400">{{ post.reading_time }} min</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  {% if page.has_other_pages %}
+  <div class="flex items-center justify-between border-t border-ink-200 pt-8 mt-8">
+    {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}" class="font-mono text-xs border border-ink-300 px-4 py-2 hover:border-ink-900 transition-colors">← Newer</a>{% else %}<div></div>{% endif %}
+    <span class="font-mono text-xs text-ink-400">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a href="?page={{ page.next_page_number }}" class="font-mono text-xs border border-ink-300 px-4 py-2 hover:border-ink-900 transition-colors">Older →</a>{% else %}<div></div>{% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="py-24 text-center">
+    <p class="font-display text-2xl text-ink-200">No posts in this category yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

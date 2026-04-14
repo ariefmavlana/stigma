@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}#{{ tag.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12">
+  <div class="border-b border-ink-200 pb-6 mb-10">
+    <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-2">Tag</p>
+    <h1 class="font-display text-4xl font-black text-ink-950">#{{ tag.name }}</h1>
+    <p class="font-mono text-xs text-ink-400 mt-2">{{ page.paginator.count }} post{{ page.paginator.count|pluralize }}</p>
+  </div>
+
+  {% if page.object_list %}
+  <div class="divide-y divide-ink-200">
+    {% for post in page.object_list %}
+    <article class="py-7 flex flex-col md:flex-row md:items-start gap-4">
+      <div class="font-mono text-xs text-ink-400 md:w-28 shrink-0 pt-1">
+        {{ post.published_at|date:"N j, Y" }}
+      </div>
+      <div class="flex-1">
+        {% if post.category %}
+        <a href="{{ post.category.get_absolute_url }}" class="font-mono text-xs uppercase tracking-wider text-ink-500 hover:text-ink-900 transition-colors">{{ post.category.name }}</a>
+        {% endif %}
+        <h2 class="font-display text-xl font-bold text-ink-900 mt-1 mb-2">
+          <a href="{{ post.get_absolute_url }}" class="hover:text-ink-500 transition-colors">{{ post.title }}</a>
+        </h2>
+        <p class="font-body text-sm text-ink-500">{{ post.excerpt|truncatewords:20 }}</p>
+      </div>
+      <div class="font-mono text-xs text-ink-400 shrink-0">{{ post.reading_time }} min</div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="font-display text-2xl text-ink-200 py-20 text-center">No posts tagged #{{ tag.name }}.</p>
+  {% endif %}
+</div>
+{% endblock %}

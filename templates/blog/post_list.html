@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}All Posts{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12">
+
+  <div class="border-b border-ink-200 pb-6 mb-10">
+    <h1 class="font-display text-4xl font-black text-ink-950">All Posts</h1>
+    <p class="font-mono text-sm text-ink-400 mt-2">Every essay, in reverse chronological order.</p>
+  </div>
+
+  {% if page.object_list %}
+  <div class="divide-y divide-ink-200">
+    {% for post in page.object_list %}
+    <article class="py-8 grid grid-cols-1 md:grid-cols-12 gap-6 group">
+      <div class="md:col-span-2 font-mono text-xs text-ink-400 pt-1">
+        <div>{{ post.published_at|date:"N j" }}</div>
+        <div class="text-ink-300">{{ post.published_at|date:"Y" }}</div>
+      </div>
+      <div class="md:col-span-8">
+        {% if post.category %}
+        <a href="{{ post.category.get_absolute_url }}"
+           class="font-mono text-xs tracking-wider uppercase text-ink-500 hover:text-ink-900 transition-colors">
+          {{ post.category.name }}
+        </a>
+        {% endif %}
+        <h2 class="font-display text-2xl font-bold text-ink-900 mt-1 mb-2 leading-snug">
+          <a href="{{ post.get_absolute_url }}"
+             class="group-hover:text-ink-500 transition-colors">
+            {{ post.title }}
+          </a>
+        </h2>
+        <p class="font-body text-sm text-ink-500 leading-relaxed">
+          {{ post.excerpt|truncatewords:25 }}
+        </p>
+      </div>
+      <div class="md:col-span-2 text-right space-y-1">
+        <div class="font-mono text-xs text-ink-400">{{ post.reading_time }} min</div>
+        {% if post.is_ai_generated %}<div class="ai-badge justify-end">✦ AI</div>{% endif %}
+        <a href="{{ post.get_absolute_url }}"
+           class="font-mono text-xs text-ink-700 hover:text-ink-950 underline transition-colors">
+          Read →
+        </a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page.has_other_pages %}
+  <div class="flex items-center justify-between border-t border-ink-200 pt-8 mt-8">
+    {% if page.has_previous %}
+    <a href="?page={{ page.previous_page_number }}"
+       class="font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors border border-ink-300 px-4 py-2 hover:border-ink-900">
+      ← Newer
+    </a>
+    {% else %}<div></div>{% endif %}
+
+    <span class="font-mono text-xs text-ink-400">
+      Page {{ page.number }} of {{ page.paginator.num_pages }}
+    </span>
+
+    {% if page.has_next %}
+    <a href="?page={{ page.next_page_number }}"
+       class="font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors border border-ink-300 px-4 py-2 hover:border-ink-900">
+      Older →
+    </a>
+    {% else %}<div></div>{% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="py-24 text-center">
+    <p class="font-display text-3xl text-ink-200 mb-3">Nothing here yet.</p>
+    <p class="font-mono text-sm text-ink-400">Check back soon.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

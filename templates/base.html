@@ -1,0 +1,348 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ BLOG_NAME }}{% endblock %} — {{ BLOG_TAGLINE }}</title>
+  <meta name="description" content="{% block meta_description %}{{ BLOG_TAGLINE }}{% endblock %}" />
+
+  <!-- Tailwind CDN (production: use PostCSS build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Playfair Display + IBM Plex Serif + IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body:    ['"IBM Plex Serif"', 'Georgia', 'serif'],
+            mono:    ['"IBM Plex Mono"', 'Menlo', 'monospace'],
+          },
+          colors: {
+            ink: {
+              50:  '#fafafa',
+              100: '#f4f4f4',
+              200: '#e8e8e8',
+              300: '#d0d0d0',
+              400: '#a0a0a0',
+              500: '#6b6b6b',
+              600: '#4a4a4a',
+              700: '#2e2e2e',
+              800: '#1a1a1a',
+              900: '#0d0d0d',
+              950: '#080808',
+            },
+          },
+          typography: {
+            DEFAULT: {
+              css: {
+                fontFamily: '"IBM Plex Serif", Georgia, serif',
+                color: '#1a1a1a',
+              }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ── Custom CSS — beyond Tailwind ─────────────────────────── */
+    :root {
+      --ink-950: #080808;
+      --ink-900: #0d0d0d;
+      --ink-800: #1a1a1a;
+      --ink-700: #2e2e2e;
+      --ink-600: #4a4a4a;
+      --ink-500: #6b6b6b;
+      --ink-400: #a0a0a0;
+      --ink-300: #d0d0d0;
+      --ink-200: #e8e8e8;
+      --ink-100: #f4f4f4;
+      --ink-50:  #fafafa;
+    }
+
+    html { background: var(--ink-50); }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Rule / divider */
+    .rule { border-color: var(--ink-300); }
+
+    /* Page-load fade in */
+    .page-enter { animation: pageEnter 0.4s ease both; }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Post card hover */
+    .post-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .post-card:hover { transform: translateY(-2px); }
+
+    /* Prose styles for rendered markdown */
+    .prose-stigma { font-family: 'IBM Plex Serif', Georgia, serif; line-height: 1.85; }
+    .prose-stigma h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--ink-900);
+    }
+    .prose-stigma h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink-800);
+    }
+    .prose-stigma p { margin-bottom: 1.4rem; color: var(--ink-700); }
+    .prose-stigma a { color: var(--ink-900); text-decoration: underline; text-decoration-color: var(--ink-400); text-underline-offset: 3px; }
+    .prose-stigma a:hover { text-decoration-color: var(--ink-900); }
+    .prose-stigma blockquote {
+      border-left: 3px solid var(--ink-900);
+      padding-left: 1.25rem;
+      font-style: italic;
+      color: var(--ink-600);
+      margin: 1.5rem 0;
+    }
+    .prose-stigma code {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--ink-100);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.875em;
+    }
+    .prose-stigma pre {
+      background: var(--ink-900);
+      color: var(--ink-100);
+      padding: 1.25rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+    .prose-stigma pre code { background: none; color: inherit; padding: 0; }
+    .prose-stigma ul { list-style: none; padding-left: 0; }
+    .prose-stigma ul li::before { content: '—'; margin-right: 0.5rem; color: var(--ink-500); }
+    .prose-stigma ul li { padding-left: 1.25rem; margin-bottom: 0.4rem; }
+    .prose-stigma ol { counter-reset: list; padding-left: 0; }
+    .prose-stigma ol li { counter-increment: list; padding-left: 1.75rem; position: relative; margin-bottom: 0.4rem; }
+    .prose-stigma ol li::before { content: counter(list); position: absolute; left: 0; font-family: 'IBM Plex Mono'; font-size: 0.8rem; color: var(--ink-500); top: 0.15rem; }
+    .prose-stigma strong { font-weight: 600; color: var(--ink-900); }
+    .prose-stigma img { width: 100%; border-radius: 2px; }
+
+    /* Form inputs */
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.65rem 0.875rem;
+      border: 1px solid var(--ink-300);
+      background: white;
+      color: var(--ink-900);
+      font-family: 'IBM Plex Serif', serif;
+      font-size: 0.95rem;
+      transition: border-color 0.15s;
+      outline: none;
+      border-radius: 0;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--ink-900);
+    }
+
+    /* AI badge */
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid var(--ink-400);
+      color: var(--ink-500);
+    }
+
+    /* Nav link underline animation */
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--ink-900);
+      transition: width 0.2s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* Masthead line */
+    .masthead-rule {
+      height: 3px;
+      background: var(--ink-900);
+    }
+
+    /* Search bar */
+    .search-bar {
+      border: none;
+      border-bottom: 1px solid var(--ink-300);
+      background: transparent;
+      font-family: 'IBM Plex Serif', serif;
+      font-size: 1rem;
+      padding: 0.4rem 0;
+      outline: none;
+      width: 100%;
+      color: var(--ink-800);
+    }
+    .search-bar::placeholder { color: var(--ink-400); }
+    .search-bar:focus { border-bottom-color: var(--ink-900); }
+  </style>
+
+  <link rel="stylesheet" href="{% static 'css/stigma.css' %}" />
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-ink-50 text-ink-900 font-body antialiased">
+
+  <!-- ── Masthead ──────────────────────────────────────────────────────────── -->
+  <header class="border-b border-ink-200">
+    <!-- Top utility bar -->
+    <div class="border-b border-ink-200 py-2">
+      <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+        <div class="flex items-center gap-4 text-xs font-mono text-ink-500 tracking-widest uppercase">
+          <span>{% now "l, N j, Y" %}</span>
+        </div>
+        <div class="flex items-center gap-5 text-xs font-mono tracking-wider uppercase">
+          <a href="{% url 'blog:search' %}" class="text-ink-500 hover:text-ink-900 transition-colors">Search</a>
+          <a href="{% url 'blog:about' %}" class="text-ink-500 hover:text-ink-900 transition-colors">About</a>
+          {% if user.is_staff %}
+          <a href="{% url 'ai_crew:generate' %}" class="text-ink-900 font-semibold">✦ AI Generate</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nameplate -->
+    <div class="py-8 text-center">
+      <a href="{% url 'blog:home' %}" class="inline-block group">
+        <h1 class="font-display text-5xl md:text-7xl font-black tracking-tight text-ink-950 leading-none">
+          {{ BLOG_NAME }}
+        </h1>
+        <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-500 mt-2">
+          {{ BLOG_TAGLINE }}
+        </p>
+      </a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="border-t border-ink-200">
+      <div class="max-w-6xl mx-auto px-6">
+        <ul class="flex items-center gap-6 py-3 overflow-x-auto">
+          <li>
+            <a href="{% url 'blog:home' %}"
+               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1">
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'blog:post_list' %}"
+               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1">
+              All Posts
+            </a>
+          </li>
+          {% for cat in global_categories %}
+          <li>
+            <a href="{{ cat.get_absolute_url }}"
+               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1 whitespace-nowrap">
+              {{ cat.name }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </nav>
+
+    <div class="masthead-rule"></div>
+  </header>
+
+  <!-- ── Messages ─────────────────────────────────────────────────────────── -->
+  {% if messages %}
+  <div class="max-w-6xl mx-auto px-6 mt-4 space-y-2">
+    {% for message in messages %}
+    <div class="border px-4 py-3 text-sm font-body flex items-start justify-between gap-4
+      {% if message.tags == 'error' %}border-red-300 bg-red-50 text-red-800
+      {% elif message.tags == 'success' %}border-green-300 bg-green-50 text-green-800
+      {% else %}border-ink-300 bg-ink-100 text-ink-700{% endif %}">
+      <span {% if 'safe' in message.tags %}{% endif %}>
+        {% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="page-enter">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <footer class="border-t border-ink-200 mt-24 py-12">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="masthead-rule mb-8"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <p class="font-display text-2xl font-bold text-ink-900 mb-2">{{ BLOG_NAME }}</p>
+          <p class="text-sm text-ink-500 font-body">{{ BLOG_TAGLINE }}</p>
+        </div>
+        <div>
+          <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-3">Navigate</p>
+          <ul class="space-y-2">
+            <li><a href="{% url 'blog:home' %}" class="text-sm text-ink-600 hover:text-ink-900 transition-colors">Home</a></li>
+            <li><a href="{% url 'blog:post_list' %}" class="text-sm text-ink-600 hover:text-ink-900 transition-colors">All Posts</a></li>
+            <li><a href="{% url 'blog:about' %}" class="text-sm text-ink-600 hover:text-ink-900 transition-colors">About</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-mono text-xs tracking-widest uppercase text-ink-400 mb-3">Categories</p>
+          <ul class="space-y-2">
+            {% for cat in global_categories %}
+            <li>
+              <a href="{{ cat.get_absolute_url }}" class="text-sm text-ink-600 hover:text-ink-900 transition-colors">
+                {{ cat.name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-ink-200 mt-8 pt-6 flex items-center justify-between">
+        <p class="font-mono text-xs text-ink-400">
+          © {% now "Y" %} {{ BLOG_NAME }}. Built with Django & CrewAI.
+        </p>
+        <p class="font-mono text-xs text-ink-400">Thoughts, crafted.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'js/stigma.js' %}" defer></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

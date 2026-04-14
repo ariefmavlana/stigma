@@ -1,0 +1,93 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# STIgma — CrewAI Task Definitions
+# Sequential process: research → write → edit
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ── Task 1: Deep Research ────────────────────────────────────────────────────
+research_task:
+  description: >
+    Research the blog topic: "{topic}"
+
+    Conduct thorough research and produce a structured research brief covering:
+
+    1. **Core Concept** — What is {topic} in plain terms? Why does it matter now?
+    2. **Key Facts & Data** — The 5–7 most compelling, citable facts or statistics.
+    3. **Current Trends** — What is happening in this space right now (2026)?
+    4. **Contrarian/Surprising Angle** — What does most content miss or get wrong?
+    5. **Human Stories** — Real examples, case studies, or anecdotes.
+    6. **Common Questions** — What do people most frequently ask about {topic}?
+    7. **Sources** — List the most credible sources found.
+
+    Target audience: {target_audience}
+    Tone guidance: {tone}
+
+    Be rigorous. If you cannot verify a fact, mark it as [UNVERIFIED].
+  expected_output: >
+    A structured Markdown research brief with all 7 sections filled out.
+    Minimum 400 words. Include at least 3 external source references.
+    Be specific — vague generalities are worthless to the writer.
+  agent: topic_researcher
+
+# ── Task 2: Write Draft ──────────────────────────────────────────────────────
+write_task:
+  description: >
+    Using the research brief provided, write a compelling blog post on "{topic}".
+
+    Requirements:
+    - **Length**: 800–1200 words
+    - **Format**: Clean Markdown (use ##, ###, bold, lists as appropriate)
+    - **Opening**: First paragraph must hook the reader immediately — start
+      with a surprising fact, a provocative question, or a vivid scenario.
+      Never start with "In today's world" or similar clichés.
+    - **Structure**: Natural flow with 3–5 sections. Each section should
+      advance the narrative, not repeat previous content.
+    - **Closing**: End with an insight or a call-to-reflection, not a summary list.
+    - **Voice**: {tone}
+    - **Audience**: {target_audience}
+    - **No fluff**: Remove any sentence that could be deleted without losing meaning.
+
+    Context from research: use all key facts and the surprising angle.
+  expected_output: >
+    A complete blog post in Markdown format, 800–1200 words.
+    Well-structured with clear headers. Strong opening, coherent body,
+    memorable closing. No meta-commentary ("In this post, I will...").
+  agent: content_writer
+  context:
+    - research_task
+
+# ── Task 3: Edit & Finalise ──────────────────────────────────────────────────
+edit_task:
+  description: >
+    Edit and finalise the blog draft on "{topic}" for publication.
+
+    Your tasks:
+    1. **Prose Polish** — Fix awkward sentences, tighten passive constructions,
+       improve transitions. Preserve the writer's voice.
+    2. **SEO Optimisation** — Ensure the primary keyword "{topic}" appears
+       naturally in: the H1 title, the first 100 words, at least 2 subheadings,
+       and the meta description.
+    3. **Fact-Check** — Cross-reference claims against the research brief.
+       Flag any [UNVERIFIED] items — either remove or contextualise them.
+    4. **Structure Review** — Does the post flow logically? Are sections the
+       right length? Is the opening strong?
+
+    Then produce your final output as a **valid JSON object** with this exact schema:
+    {{
+      "title": "The final post title (max 70 chars, SEO optimised)",
+      "meta_description": "155-char meta description with primary keyword",
+      "excerpt": "Punchy 1–2 sentence excerpt for listing pages (max 280 chars)",
+      "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+      "reading_time_minutes": <integer>,
+      "body": "The complete polished post in Markdown (escaped for JSON)"
+    }}
+
+    CRITICAL: Output ONLY the JSON object. No preamble, no explanation, no
+    Markdown fences. Just the raw JSON.
+  expected_output: >
+    A single, valid JSON object matching the schema above.
+    The body field contains the complete polished Markdown post.
+    All string fields are properly JSON-escaped.
+  agent: content_editor
+  context:
+    - research_task
+    - write_task

@@ -1,0 +1,167 @@
+/*
+ * STIgma — Supplemental Stylesheet
+ * ───────────────────────────────────
+ * Additional styles that complement TailwindCSS.
+ * Load AFTER the Tailwind CDN script.
+ */
+
+/* ── Code syntax highlight (codehilite) ──────────────────────────────────── */
+.codehilite {
+  background: #0d0d0d;
+  border-radius: 4px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.codehilite pre {
+  margin: 0;
+  color: #f4f4f4;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.65;
+}
+
+.codehilite .k {
+  color: #a0a0a0;
+}
+
+/* keyword */
+.codehilite .s {
+  color: #d0d0d0;
+}
+
+/* string */
+.codehilite .c {
+  color: #5a5a5a;
+  font-style: italic;
+}
+
+/* comment */
+.codehilite .n {
+  color: #e8e8e8;
+}
+
+/* name */
+.codehilite .o {
+  color: #a0a0a0;
+}
+
+/* operator */
+.codehilite .mi {
+  color: #d0d0d0;
+}
+
+/* integer */
+
+/* ── Table styles in prose ───────────────────────────────────────────────── */
+.prose-stigma table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.prose-stigma thead {
+  border-bottom: 2px solid #0d0d0d;
+}
+
+.prose-stigma th {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4a4a4a;
+}
+
+.prose-stigma td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #e8e8e8;
+  color: #2e2e2e;
+}
+
+.prose-stigma tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Horizontal rule in prose ────────────────────────────────────────────── */
+.prose-stigma hr {
+  border: none;
+  border-top: 1px solid #d0d0d0;
+  margin: 2.5rem 0;
+}
+
+/* ── Heading anchor links ────────────────────────────────────────────────── */
+.prose-stigma h2 a,
+.prose-stigma h3 a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.prose-stigma h2:hover::after,
+.prose-stigma h3:hover::after {
+  content: ' #';
+  color: #a0a0a0;
+  font-size: 0.8em;
+}
+
+/* ── Line clamp (for older browsers without CSS support) ─────────────────── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Print styles ────────────────────────────────────────────────────────── */
+@media print {
+
+  header,
+  footer,
+  aside,
+  .ai-badge {
+    display: none !important;
+  }
+
+  .prose-stigma {
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 24pt;
+  }
+}
+
+/* ── Scroll progress indicator ───────────────────────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #0d0d0d;
+  z-index: 10000;
+  transition: width 0.1s linear;
+  width: 0%;
+}
+
+/* ── Focus visible (accessibility) ──────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #0d0d0d;
+  outline-offset: 2px;
+}
+
+/* ── Selection colour ────────────────────────────────────────────────────── */
+::selection {
+  background: #0d0d0d;
+  color: #fafafa;
+}
