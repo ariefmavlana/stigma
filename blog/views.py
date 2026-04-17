@@ -65,8 +65,13 @@ def post_list(request):
 
 
 def post_detail(request, slug):
-    """Individual post view with comment form."""
-    post = get_object_or_404(Post, slug=slug, status=Post.Status.PUBLISHED)
+    """Individual post view with comment form. Staff can see drafts."""
+    if request.user.is_staff:
+        # Staff can see drafts, published, and archived posts
+        post = get_object_or_404(Post, slug=slug)
+    else:
+        # Public users can only see published posts
+        post = get_object_or_404(Post, slug=slug, status=Post.Status.PUBLISHED)
 
     # Atomic view-count increment (no race condition)
     Post.objects.filter(pk=post.pk).update(views=F("views") + 1)

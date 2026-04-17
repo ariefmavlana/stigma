@@ -131,10 +131,11 @@ class BlogWriterCrew:
         return Task(config=self.tasks_config["edit_task"])  # type: ignore[index]
 
     @crew
-    def crew(self) -> Crew:
+    def crew(self, step_callback=None) -> Crew:
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            step_callback=step_callback,
         )

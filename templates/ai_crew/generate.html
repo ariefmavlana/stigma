@@ -2,367 +2,159 @@
 {% block title %}AI Post Generator{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-6 py-12">
+<div class="max-w-3xl mx-auto px-6 py-12" _="on load transition my opacity from 0 to 1 over 500ms">
 
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
-  <div class="border-b border-ink-200 pb-8 mb-10">
-    <div class="flex items-center gap-3 mb-4">
-      <span class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 border border-ink-300 px-2 py-1">
-        Staff Only
+  <div class="border-b-2 border-ink-950 pb-8 mb-12">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="font-mono text-[10px] tracking-[0.4em] uppercase text-white bg-ink-950 px-3 py-1 font-bold">
+        Internal / Editorial
       </span>
-      <span class="ai-badge">✦ AI-Powered</span>
+      <span class="bg-ink-100 text-ink-900 font-mono text-[10px] tracking-wider uppercase px-2 py-1 border border-ink-300">
+        ✦ AI Pipeline v2.0
+      </span>
     </div>
-    <h1 class="font-display text-4xl font-black text-ink-950 mb-3">AI Post Generator</h1>
-    <p class="font-body text-ink-500 leading-relaxed">
-      A three-agent CrewAI pipeline researches your topic, writes a full draft,
-      and delivers a polished post saved as a <strong>Draft</strong> for your review.
-      Generation runs asynchronously — submit and watch live progress below.
+    <h1 class="font-display text-5xl font-black text-ink-950 mb-4 tracking-tighter">AI Content Engine</h1>
+    <p class="font-body text-ink-500 leading-relaxed max-w-2xl">
+      Deploy a three-agent CrewAI pipeline (Research → Write → Edit). 
+      The system handles deep web searches and delivers high-fidelity 
+      editorial drafts directly to your database.
     </p>
   </div>
 
   <!-- ── Agent Pipeline ─────────────────────────────────────────────────── -->
-  <div class="bg-ink-100 border border-ink-200 p-6 mb-10">
-    <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-4">Agent Pipeline</p>
-    <div class="flex items-center gap-3 flex-wrap">
-      <div class="flex-1 min-w-0 border border-ink-300 bg-white p-3">
-        <p class="font-mono text-xs text-ink-500 uppercase tracking-wider mb-1">Agent 1</p>
-        <p class="font-body text-sm font-semibold text-ink-900">Topic Researcher</p>
-        <p class="font-mono text-xs text-ink-400 mt-1">SerperDev · WebRAG</p>
-      </div>
-      <div class="font-mono text-ink-300 text-lg">→</div>
-      <div class="flex-1 min-w-0 border border-ink-300 bg-white p-3">
-        <p class="font-mono text-xs text-ink-500 uppercase tracking-wider mb-1">Agent 2</p>
-        <p class="font-body text-sm font-semibold text-ink-900">Content Writer</p>
-        <p class="font-mono text-xs text-ink-400 mt-1">800–1200 word Markdown</p>
-      </div>
-      <div class="font-mono text-ink-300 text-lg">→</div>
-      <div class="flex-1 min-w-0 border border-ink-300 bg-white p-3">
-        <p class="font-mono text-xs text-ink-500 uppercase tracking-wider mb-1">Agent 3</p>
-        <p class="font-body text-sm font-semibold text-ink-900">Content Editor</p>
-        <p class="font-mono text-xs text-ink-400 mt-1">Polish · SEO · JSON</p>
-      </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 mb-12 bg-ink-200 border border-ink-200 p-1">
+    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
+      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 01</p>
+      <p class="font-body text-sm font-black text-ink-900">Researcher</p>
+      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">SerperDev + WebRAG</p>
+    </div>
+    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
+      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 02</p>
+      <p class="font-body text-sm font-black text-ink-900">Writer</p>
+      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">markdown_v2 · 1.2k words</p>
+    </div>
+    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
+      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 03</p>
+      <p class="font-body text-sm font-black text-ink-900">Editor</p>
+      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">seo_audit · structured_json</p>
     </div>
   </div>
 
   <!-- ── Generation Form ────────────────────────────────────────────────── -->
-  <form id="generate-form" class="space-y-6">
-    {% csrf_token %}
+  <div id="form-container">
+    <form id="generate-form" 
+          hx-post="{% url 'ai_crew:generate' %}"
+          hx-target="#status-panel"
+          hx-swap="outerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()"
+          _="on submit 
+             transition #form-container opacity to 0 over 300ms 
+             then add .hidden to #form-container
+             remove .hidden from #status-panel"
+          class="space-y-8">
+      {% csrf_token %}
 
-    {% for field in form %}
-    <div>
-      <label class="block font-mono text-xs tracking-wider uppercase text-ink-500 mb-2">
-        {{ field.label }}
-        {% if field.field.required %}<span class="text-ink-900 ml-1">*</span>{% endif %}
-      </label>
-      {{ field }}
-      {% if field.help_text %}
-      <p class="font-mono text-xs text-ink-400 mt-1">{{ field.help_text }}</p>
-      {% endif %}
-      {% for error in field.errors %}
-      <p class="font-mono text-xs text-red-500 mt-1">{{ error }}</p>
+      {% for field in form %}
+      <div class="group">
+        <label class="block font-mono text-xs tracking-widest uppercase text-ink-900 font-black mb-3 group-focus-within:text-ink-500 transition-colors">
+          {{ field.label }}
+          {% if field.field.required %}<span class="text-ink-300 ml-1">#req</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.help_text %}
+        <p class="font-mono text-[10px] text-ink-400 mt-2 italic capitalize tracking-wide">{{ field.help_text }}</p>
+        {% endif %}
+        {% for error in field.errors %}
+        <p class="font-mono text-xs text-red-600 mt-2 font-bold">{{ error }}</p>
+        {% endfor %}
+      </div>
       {% endfor %}
-    </div>
-    {% endfor %}
 
-    <div class="border border-ink-200 bg-ink-50 p-4">
-      <p class="font-mono text-xs text-ink-500">
-        <strong class="text-ink-700">Note:</strong> Ensure
-        <code>NVIDIA_API_KEY</code> and <code>SERPER_API_KEY</code> are set in
-        <code>.env</code>. The post will be saved as <strong>Draft</strong> — you
-        must publish it manually.
-      </p>
-    </div>
-
-    <button type="submit" id="submit-btn"
-            class="w-full font-mono text-sm tracking-widest uppercase bg-ink-950 text-ink-50
-                   py-4 hover:bg-ink-700 transition-colors flex items-center justify-center gap-3">
-      ✦ Generate Post with AI
-    </button>
-  </form>
-
-  <!-- ── Live Status Panel (hidden until job starts) ────────────────────── -->
-  <div id="status-panel" class="hidden mt-10 border border-ink-300 bg-white">
-    <!-- Running -->
-    <div id="status-running" class="hidden p-6">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-3 h-3 bg-ink-900 rounded-full animate-pulse"></div>
-        <p class="font-mono text-sm tracking-wider uppercase text-ink-700">Running Crew…</p>
-        <span id="elapsed-time" class="font-mono text-xs text-ink-400 ml-auto"></span>
+      <div class="border-2 border-dashed border-ink-200 p-6 bg-ink-50/50">
+        <p class="font-mono text-[11px] text-ink-500 leading-relaxed">
+          <strong class="text-ink-950">Architecture Note:</strong> This pipeline uses NVIDIA NIM 
+          for high-speed reasoning. Average duration is 120s. Result will be stored as 
+          an unpublished <code>Draft</code> for manual verification.
+        </p>
       </div>
-      <div class="bg-ink-100 h-1 w-full mb-4">
-        <div id="progress-bar" class="h-1 bg-ink-700 transition-all duration-500" style="width: 5%"></div>
-      </div>
-      <div class="space-y-2 font-mono text-xs text-ink-500">
-        <div id="step-research" class="flex items-center gap-2">
-          <span id="step-research-icon">○</span>
-          <span>Agent 1 — Topic Researcher</span>
+
+      <button type="submit" id="submit-btn"
+              class="w-full group relative overflow-hidden bg-ink-950 text-white py-5 transition-all duration-300 hover:bg-black active:scale-[0.99]">
+        <div class="relative z-10 flex items-center justify-center gap-4 font-mono text-xs tracking-[0.4em] uppercase font-bold">
+          <span>Initialize Generation</span>
+          <span class="opacity-30 group-hover:opacity-100 transition-opacity">✦</span>
         </div>
-        <div id="step-write" class="flex items-center gap-2">
-          <span id="step-write-icon">○</span>
-          <span>Agent 2 — Content Writer</span>
-        </div>
-        <div id="step-edit" class="flex items-center gap-2">
-          <span id="step-edit-icon">○</span>
-          <span>Agent 3 — Content Editor + JSON</span>
-        </div>
-      </div>
-      <p class="font-mono text-xs text-ink-400 mt-4">
-        Typical runtime: 90 seconds – 4 minutes. Page stays live, you can leave and come back.
-      </p>
-    </div>
-
-    <!-- Done -->
-    <div id="status-done" class="hidden p-6">
-      <div class="flex items-center gap-3 mb-5">
-        <span class="text-xl">✓</span>
-        <p class="font-mono text-sm tracking-wider uppercase text-ink-900 font-bold">Post Generated</p>
-      </div>
-      <p id="done-title" class="font-display text-xl font-bold text-ink-950 mb-2"></p>
-      <p id="done-excerpt" class="font-body text-sm text-ink-500 mb-4 leading-relaxed"></p>
-      <div id="done-tags" class="flex flex-wrap gap-2 mb-5"></div>
-      <div class="flex items-center gap-3 flex-wrap">
-        <a id="done-admin-link" href="#"
-           class="font-mono text-xs tracking-widest uppercase bg-ink-950 text-ink-50 px-4 py-2 hover:bg-ink-700 transition-colors">
-          Edit in Admin →
-        </a>
-        <a id="done-public-link" href="#"
-           class="font-mono text-xs tracking-widest uppercase border border-ink-300 text-ink-700 px-4 py-2 hover:border-ink-900 transition-colors">
-          Preview (draft) →
-        </a>
-        <button id="generate-another"
-                class="font-mono text-xs tracking-widest uppercase text-ink-400 px-4 py-2 hover:text-ink-900 transition-colors">
-          Generate Another
-        </button>
-      </div>
-    </div>
-
-    <!-- Error -->
-    <div id="status-error" class="hidden p-6 border-l-4 border-red-400">
-      <p class="font-mono text-xs uppercase tracking-wider text-red-600 mb-2">Generation Failed</p>
-      <p id="error-message" class="font-body text-sm text-red-800"></p>
-      <button id="try-again" class="font-mono text-xs tracking-widest uppercase text-ink-500 mt-3 hover:text-ink-900 transition-colors">
-        ← Try Again
+        <!-- Button hover effect line -->
+        <div class="absolute bottom-0 left-0 h-1 bg-white w-0 group-hover:w-full transition-all duration-500"></div>
       </button>
-    </div>
+    </form>
   </div>
 
-  <!-- ── Recent AI-Generated Posts ─────────────────────────────────────── -->
+  <!-- ── Status Panel Placeholder ─────────────────────────────────────── -->
+  <div id="status-panel" class="hidden">
+      <!-- Content will be replaced by HTMX Runner Partial -->
+  </div>
+
+  <!-- ── Recent Activity ──────────────────────────────────────────────── -->
   {% if recent_ai_posts %}
-  <div id="recent-posts-section" class="mt-14 border-t border-ink-200 pt-8">
-    <div class="flex items-baseline justify-between mb-6">
-      <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400">Recent AI Posts</p>
+  <div id="recent-posts-section" class="mt-24 border-t-4 border-ink-950 pt-10">
+    <div class="flex items-baseline justify-between mb-8">
+      <p class="font-mono text-[11px] tracking-[0.5em] uppercase text-ink-900 font-black">History / Logs</p>
       <a href="/admin/blog/post/?is_ai_generated__exact=1"
-         class="font-mono text-xs text-ink-500 hover:text-ink-900 transition-colors">
-        View all in Admin →
+         class="font-mono text-[10px] text-ink-400 hover:text-ink-950 transition-colors uppercase tracking-widest border-b border-transparent hover:border-ink-950 pb-0.5">
+        Master Logs →
       </a>
     </div>
-    <div class="space-y-0 divide-y divide-ink-200">
-      {% for post in recent_ai_posts %}
-      <div class="py-4 flex items-start justify-between gap-4">
-        <div class="flex-1 min-w-0">
-          <p class="font-body text-sm font-medium text-ink-900 truncate">{{ post.title }}</p>
-          <div class="flex items-center gap-3 mt-1">
-            <span class="font-mono text-xs text-ink-400">{{ post.created_at|date:"N j, Y" }}</span>
-            <span class="font-mono text-xs px-1.5 py-0.5 border
-              {% if post.status == 'published' %}border-green-400 text-green-700
-              {% elif post.status == 'draft' %}border-ink-300 text-ink-500
-              {% else %}border-red-300 text-red-600{% endif %}">
-              {{ post.get_status_display }}
-            </span>
-            {% if post.category %}
-            <span class="font-mono text-xs text-ink-400">{{ post.category.name }}</span>
-            {% endif %}
-          </div>
-        </div>
-        <a href="/admin/blog/post/{{ post.pk }}/change/"
-           class="font-mono text-xs text-ink-500 hover:text-ink-900 whitespace-nowrap transition-colors">
-          Edit →
-        </a>
-      </div>
-      {% endfor %}
+    
+    <div class="overflow-hidden border border-ink-200">
+      <table class="w-full text-left font-mono text-xs">
+        <thead class="bg-ink-50 border-b border-ink-200">
+          <tr>
+            <th class="px-4 py-3 text-ink-400 font-normal uppercase tracking-widest uppercase">ID/Status</th>
+            <th class="px-4 py-3 text-ink-900 font-bold uppercase tracking-widest">Post Title</th>
+            <th class="px-4 py-3 text-right"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-ink-100">
+          {% for post in recent_ai_posts %}
+          <tr class="hover:bg-ink-50 transition-colors group">
+            <td class="px-4 py-4 whitespace-nowrap">
+              <span class="inline-block w-1.5 h-1.5 rounded-full mr-2 
+                {% if post.status == 'published' %}bg-green-500{% else %}bg-ink-300 shadow-[0_0_5px_rgba(0,0,0,0.1)]{% endif %}"></span>
+              <span class="text-ink-400 uppercase text-[10px] tracking-tighter">{{ post.status }}</span>
+            </td>
+            <td class="px-4 py-4">
+              <p class="text-ink-900 font-medium line-clamp-1 group-hover:underline">{{ post.title }}</p>
+            </td>
+            <td class="px-4 py-4 text-right">
+              <a href="/admin/blog/post/{{ post.pk }}/change/"
+                 class="text-ink-400 hover:text-ink-950 transition-colors">
+                [Edit]
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
   {% endif %}
 
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-(function () {
-  'use strict';
-
-  const form       = document.getElementById('generate-form');
-  const submitBtn  = document.getElementById('submit-btn');
-  const statusPanel   = document.getElementById('status-panel');
-  const statusRunning = document.getElementById('status-running');
-  const statusDone    = document.getElementById('status-done');
-  const statusError   = document.getElementById('status-error');
-
-  // Progress bar + elapsed clock
-  const progressBar  = document.getElementById('progress-bar');
-  const elapsedEl    = document.getElementById('elapsed-time');
-  const stepIcons    = {
-    research: document.getElementById('step-research-icon'),
-    write:    document.getElementById('step-write-icon'),
-    edit:     document.getElementById('step-edit-icon'),
-  };
-
-  let pollInterval  = null;
-  let clockInterval = null;
-  let startTime     = null;
-
-  /* ── Clock & fake progress ──────────────────────────────────────────── */
-  function startClock() {
-    startTime = Date.now();
-    let progressPct = 5;
-    const stages = [
-      { threshold: 20,  pct: 30,  icon: 'research', symbol: '●' },
-      { threshold: 60,  pct: 60,  icon: 'write',    symbol: '●' },
-      { threshold: 100, pct: 88,  icon: 'edit',     symbol: '●' },
-    ];
-
-    clockInterval = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      const mins = Math.floor(elapsed / 60);
-      const secs = elapsed % 60;
-      elapsedEl.textContent = mins > 0
-        ? `${mins}m ${String(secs).padStart(2,'0')}s elapsed`
-        : `${secs}s elapsed`;
-
-      // Animate fake progress
-      stages.forEach(s => {
-        if (elapsed >= s.threshold) {
-          progressPct = Math.max(progressPct, s.pct);
-          stepIcons[s.icon].textContent = s.symbol;
-        }
-      });
-      // Slowly creep toward 95% while waiting
-      if (progressPct < 93) progressPct += 0.08;
-      progressBar.style.width = progressPct.toFixed(1) + '%';
-    }, 1000);
+<!-- Styles for specific custom effects -->
+<style>
+  input[type="text"], select, textarea {
+    @apply w-full border-2 border-ink-100 bg-white px-5 py-4 font-mono text-sm transition-all duration-200;
   }
-
-  function stopClock() {
-    clearInterval(clockInterval);
+  input[type="text"]:focus, select:focus, textarea:focus {
+    @apply border-ink-950 outline-none ring-0 bg-ink-50/30;
   }
-
-  /* ── Poll the status endpoint ───────────────────────────────────────── */
-  function startPolling(taskId) {
-    const url = `/ai/generate/status/${taskId}/`;
-    pollInterval = setInterval(async () => {
-      try {
-        const res  = await fetch(url);
-        const data = await res.json();
-
-        if (data.status === 'done') {
-          clearInterval(pollInterval);
-          stopClock();
-          showDone(data);
-        } else if (data.status === 'error') {
-          clearInterval(pollInterval);
-          stopClock();
-          showError(data.error || 'An unknown error occurred.');
-        }
-        // 'running' → keep polling
-      } catch (err) {
-        console.error('Poll error', err);
-      }
-    }, 3000); // poll every 3 seconds
+  /* Custom glass effect for pipeline */
+  .pipeline-card {
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.8);
   }
-
-  /* ── UI State transitions ───────────────────────────────────────────── */
-  function showRunning() {
-    form.closest ? form.style.opacity = '0.4' : null;
-    form.style.pointerEvents = 'none';
-    submitBtn.disabled = true;
-    statusPanel.classList.remove('hidden');
-    statusRunning.classList.remove('hidden');
-    statusDone.classList.add('hidden');
-    statusError.classList.add('hidden');
-  }
-
-  function showDone(data) {
-    progressBar.style.width = '100%';
-    Object.values(stepIcons).forEach(el => el.textContent = '✓');
-
-    document.getElementById('done-title').textContent   = data.post_title || '';
-    document.getElementById('done-excerpt').textContent = data.excerpt    || '';
-    document.getElementById('done-admin-link').href     = data.post_admin_url  || '#';
-    document.getElementById('done-public-link').href    = data.post_public_url || '#';
-
-    const tagsEl = document.getElementById('done-tags');
-    tagsEl.innerHTML = '';
-    (data.tags || []).forEach(tag => {
-      const span = document.createElement('span');
-      span.className = 'font-mono text-xs border border-ink-300 px-2 py-0.5 text-ink-500';
-      span.textContent = tag;
-      tagsEl.appendChild(span);
-    });
-
-    statusRunning.classList.add('hidden');
-    statusDone.classList.remove('hidden');
-
-    // Auto-refresh recent posts list
-    setTimeout(() => location.reload(), 8000);
-  }
-
-  function showError(message) {
-    document.getElementById('error-message').textContent = message;
-    statusRunning.classList.add('hidden');
-    statusError.classList.remove('hidden');
-    // Re-enable form
-    form.style.opacity = '1';
-    form.style.pointerEvents = '';
-    submitBtn.disabled = false;
-  }
-
-  /* ── "Generate Another" / "Try Again" ──────────────────────────────── */
-  document.getElementById('generate-another').addEventListener('click', () => {
-    statusPanel.classList.add('hidden');
-    form.style.opacity = '1';
-    form.style.pointerEvents = '';
-    submitBtn.disabled = false;
-    progressBar.style.width = '5%';
-    Object.values(stepIcons).forEach(el => el.textContent = '○');
-  });
-
-  document.getElementById('try-again').addEventListener('click', () => {
-    statusPanel.classList.add('hidden');
-  });
-
-  /* ── Form submit → AJAX ─────────────────────────────────────────────── */
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    showRunning();
-    startClock();
-
-    try {
-      const res = await fetch('/ai/generate/', {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
-        },
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || data.error) {
-        stopClock();
-        showError(data.error || `Server error ${res.status}`);
-        return;
-      }
-
-      startPolling(data.task_id);
-
-    } catch (err) {
-      stopClock();
-      showError(`Network error: ${err.message}`);
-    }
-  });
-})();
-</script>
+</style>
 {% endblock %}

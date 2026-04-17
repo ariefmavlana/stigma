@@ -135,19 +135,21 @@ The post will appear on the homepage immediately.
 
 ### Generating a Post with AI
 
-1. Visit `http://localhost:8000/ai/generate/` (staff login required)
+1. Visit `http://localhost:8000/ai/generate/` (Staff login required).
 2. Fill in the form:
    - **Topic:** e.g. `The Hidden Cost of Microservices Architecture`
    - **Target Audience:** e.g. `Senior software engineers and engineering managers`
-   - **Tone:** Choose from the dropdown
-   - **Category:** Optional — assigns the generated post to a category
-3. Click **✦ Generate Post with AI**
-4. Wait 2–5 minutes. The three agents will run sequentially:
-   - Researcher searches the web and compiles a brief
-   - Writer drafts the full post
-   - Editor polishes it and outputs structured JSON
-5. A success message appears with a link to the draft in Admin
-6. Review the draft in Admin → edit if needed → set **Status → Published**
+   - **Tone:** Choose a personality for the AI Writer.
+   - **Category:** Optional — sets the category for the generated post.
+3. Click **✦ Generate Post with AI**.
+4. **Interactive Progress:** 
+   - A live panel will appear instantly (powered by **HTMX** and **Hyperscript**).
+   - You can watch the elapsed time and agent progress in real-time.
+   - You can navigate away and come back; the polling will resume automatically.
+5. **Review & Publish:**
+   - Once complete, a success panel appears with a **Preview (draft)** link.
+   - As a staff member, you can preview the draft directly.
+   - Go to Admin → **Blog → Posts** → find the generated draft → edit as needed → set **Status → Published**.
 
 > **If generation fails:** Check that `OPENAI_API_KEY` and `SERPER_API_KEY` are set correctly in `.env`. Restart the server after changing `.env`.
 

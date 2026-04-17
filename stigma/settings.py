@@ -114,10 +114,20 @@ CREWAI_LLM_MODEL = os.getenv("CREWAI_LLM_MODEL", "nvidia/nemotron-3-super-120b-a
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "")
 SERPER_API_KEY = os.getenv("SERPER_API_KEY", "")
 
+# ── Celery ──────────────────────────────────────────────────────────────────
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+
 # ── Blog Settings ────────────────────────────────────────────────────────────
 BLOG_POSTS_PER_PAGE = 9
 BLOG_NAME = "STIgma"
-BLOG_TAGLINE = "Thoughts, crafted."
+BLOG_TAGLINE = "Thoughts, Crafted."
 
 # ── Django Admin Branding ────────────────────────────────────────────────────
 ADMIN_SITE_HEADER = "✦ STIgma Admin"

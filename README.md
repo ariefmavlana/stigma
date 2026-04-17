@@ -16,20 +16,14 @@ STIgma is a minimal, monochrome blog built with **Django**, **CrewAI**, and **Po
 
 ---
 
-## Tech Stack
-
 | Layer | Technology |
 |-------|-----------|
-| Language | Python 3.12 |
-| Package manager | uv |
-| Framework | Django 4.2 LTS |
-| Database | PostgreSQL 17 + psycopg3 |
-| AI framework | CrewAI ≥0.100 |
-| LLM | OpenAI (configurable) |
-| Web search | SerperDev API |
-| Frontend | TailwindCSS (CDN) |
-| Typography | Playfair Display + IBM Plex Serif |
-| Static files | WhiteNoise |
+| Language | Python 3.12 (uv) |
+| Web Framework | Django 4.2 LTS |
+| Dynamic UI | HTMX + Hyperscript |
+| AI Pipeline | CrewAI + SerperDev |
+| Styling | TailwindCSS |
+| Documentation | ADD + ADR (Standards) |
 
 ---
 
@@ -85,12 +79,10 @@ Full setup guide: **[docs/USAGE.md](docs/USAGE.md)**
 
 | Document | Description |
 |----------|-------------|
-| [docs/ADD.md](docs/ADD.md) | Architectural Design Document — full system design |
-| [docs/USAGE.md](docs/USAGE.md) | Step-by-step setup, usage, and deployment guide |
-| [docs/adr/ADR-001](docs/adr/ADR-001-django-framework.md) | Why Django |
-| [docs/adr/ADR-002](docs/adr/ADR-002-crewai-integration.md) | Why CrewAI + multi-agent |
-| [docs/adr/ADR-003](docs/adr/ADR-003-postgresql.md) | Why PostgreSQL 17 |
-| [docs/adr/ADR-004](docs/adr/ADR-004-tailwindcss.md) | Why TailwindCSS |
+| [docs/ADD.md](docs/ADD.md) | **Architectural Design Document** — full system design |
+| [docs/USAGE.md](docs/USAGE.md) | **Usage Guide** — setup, generation, and deployment |
+| [docs/CHANGELOG.md](docs/CHANGELOG.md) | **Changelog** — history of advanced features |
+| [docs/adr/](docs/adr/) | **Architecture Decision Records** — why we built it this way |
 
 ---
 
@@ -140,12 +132,15 @@ stigma/
 ├── static/                     # Static assets
 └── docs/                       # Documentation
     ├── ADD.md
+    ├── CHANGELOG.md             # Advanced phase history
     ├── USAGE.md
     └── adr/
         ├── ADR-001-django-framework.md
         ├── ADR-002-crewai-integration.md
         ├── ADR-003-postgresql.md
-        └── ADR-004-tailwindcss.md
+        ├── ADR-004-tailwindcss.md
+        ├── ADR-005-htmx-hyperscript.md        # New
+        └── ADR-006-threading-task-management.md # New
 ```
 
 ---

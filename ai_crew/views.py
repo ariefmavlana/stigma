@@ -1,134 +1,31 @@
 """
 STIgma — AI Crew Django Views
 ───────────────────────────────
-Async generation: POST returns a task_id immediately; the crew runs in a
-background thread; the frontend polls /ai/generate/status/<task_id>/.
-This prevents HTTP timeouts on long LLM runs (2–5 minutes).
+Async generation: Uses Celery + Redis to run the CrewAI pipeline.
+The frontend polls /ai/generate/status/<task_id>/ which queries Celery.
 """
 
-import json
 import logging
-import re
-import threading
-import uuid as uuid_module
+import time
 
+from celery.result import AsyncResult
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-from django.db import close_old_connections
 
-from blog.models import Post, Category
-from .crew import BlogWriterCrew
+from blog.models import Post
 from .forms import GeneratePostForm
+from .tasks import generate_ai_post_task
 
 logger = logging.getLogger(__name__)
-
-# ── In-memory task store ──────────────────────────────────────────────────────
-_tasks: dict = {}
-_tasks_lock = threading.Lock()
-
-
-def _clean_json(raw: str) -> str:
-    """Strip markdown fences and leading prose — return only the JSON object."""
-    raw = raw.strip()
-    raw = re.sub(r"^```[a-zA-Z]*\s*", "", raw)
-    raw = re.sub(r"\s*```$", "", raw)
-    raw = raw.strip()
-    start = raw.find("{")
-    end = raw.rfind("}")
-    if start != -1 and end != -1 and end > start:
-        raw = raw[start : end + 1]
-    return raw.strip()
-
-
-def _run_crew_background(task_id, topic, target_audience, tone, category_id, user_id):
-    """
-    Daemon thread: run the BlogWriterCrew, parse JSON, save a draft Post,
-    and update the shared task store.
-    """
-    close_old_connections()
-    try:
-        from django.contrib.auth.models import User
-
-        user = User.objects.get(pk=user_id)
-
-        result = BlogWriterCrew().crew().kickoff(
-            inputs={
-                "topic": topic,
-                "target_audience": target_audience,
-                "tone": tone,
-            }
-        )
-
-        raw = _clean_json(result.raw)
-        post_data = json.loads(raw)
-
-        post = Post(
-            title=post_data.get("title", topic)[:300],
-            excerpt=post_data.get("excerpt", "")[:500],
-            body=post_data.get("body", raw),
-            status=Post.Status.DRAFT,
-            is_ai_generated=True,
-            author=user,
-            published_at=timezone.now(),
-        )
-
-        try:
-            ai_rt = int(post_data.get("reading_time_minutes", 0))
-            if ai_rt > 0:
-                post.reading_time = ai_rt
-        except (ValueError, TypeError):
-            pass
-
-        if category_id:
-            try:
-                post.category = Category.objects.get(pk=category_id)
-            except Category.DoesNotExist:
-                pass
-
-        post.save()
-
-        raw_tags = post_data.get("tags", [])
-        if isinstance(raw_tags, list) and raw_tags:
-            clean_tags = [str(t).strip()[:100] for t in raw_tags if t][:10]
-            if clean_tags:
-                post.tags.add(*clean_tags)
-
-        with _tasks_lock:
-            _tasks[task_id] = {
-                "status": "done",
-                "post_id": str(post.pk),
-                "post_title": post.title,
-                "post_admin_url": f"/admin/blog/post/{post.pk}/change/",
-                "post_public_url": post.get_absolute_url(),
-                "excerpt": (post.excerpt or "")[:280],
-                "tags": list(post.tags.names()),
-                "reading_time": post.reading_time,
-            }
-        logger.info("CrewAI task %s complete → Post pk=%s", task_id, post.pk)
-
-    except json.JSONDecodeError as exc:
-        logger.error("CrewAI output not valid JSON [task=%s]: %s", task_id, exc)
-        with _tasks_lock:
-            _tasks[task_id] = {
-                "status": "error",
-                "error": "The AI returned output that could not be parsed. Please try again.",
-            }
-    except Exception as exc:
-        logger.exception("Background crew error [task=%s]", task_id)
-        with _tasks_lock:
-            _tasks[task_id] = {"status": "error", "error": str(exc)}
-    finally:
-        close_old_connections()
 
 
 @staff_member_required
 def generate_view(request):
     """
     GET  — Render generation form with recent AI posts.
-    POST — Validate, start background thread, return {task_id} JSON.
+    POST — Dispatch Celery task, return {task_id}.
     """
     recent_ai_posts = (
         Post.objects.filter(is_ai_generated=True)
@@ -144,27 +41,32 @@ def generate_view(request):
                 status=400,
             )
 
-        task_id = str(uuid_module.uuid4())
         topic = form.cleaned_data["topic"]
         cat_obj = form.cleaned_data.get("category")
+        
+        # Start time in MS for the Hyperscript timer
+        start_time_ms = time.time() * 1000
 
-        with _tasks_lock:
-            _tasks[task_id] = {"status": "running", "topic": topic}
-
-        thread = threading.Thread(
-            target=_run_crew_background,
-            args=(
-                task_id,
-                topic,
-                form.cleaned_data["target_audience"],
-                form.cleaned_data["tone"],
-                cat_obj.pk if cat_obj else None,
-                request.user.pk,
-            ),
-            daemon=True,
+        # Dispatch Celery task
+        task = generate_ai_post_task.delay(
+            topic=topic,
+            target_audience=form.cleaned_data["target_audience"],
+            tone=form.cleaned_data["tone"],
+            category_id=cat_obj.pk if cat_obj else None,
+            user_id=request.user.pk,
+            start_time=start_time_ms
         )
-        thread.start()
-        logger.info("Started crew thread [task=%s, topic=%r]", task_id, topic)
+        
+        task_id = task.id
+        logger.info("Dispatched celery task [id=%s, topic=%r]", task_id, topic)
+        
+        if request.headers.get("HX-Request"):
+            return render(request, "ai_crew/partials/status_running.html", {
+                "task_id": task_id,
+                "progress": 5,
+                "start_time": start_time_ms
+            })
+            
         return JsonResponse({"task_id": task_id, "status": "running"})
 
     form = GeneratePostForm()
@@ -182,9 +84,49 @@ def generate_view(request):
 @staff_member_required
 @require_http_methods(["GET"])
 def task_status_view(request, task_id):
-    """Poll endpoint — returns current task state as JSON."""
-    with _tasks_lock:
-        task = _tasks.get(task_id)
-    if task is None:
-        return JsonResponse({"status": "not_found"}, status=404)
-    return JsonResponse(task)
+    """Poll endpoint — queries Celery for status and result."""
+    result = AsyncResult(task_id)
+    
+    # Base response for non-HTMX requests (internal API use)
+    response_data = {
+        "task_id": task_id,
+        "status": result.status.lower(),
+    }
+
+    if result.ready():
+        if result.successful():
+            response_data.update(result.result) # Merges the dict returned by task
+        else:
+            response_data.update({"status": "error", "error": str(result.result)})
+
+    # HTMX partial rendering
+    if request.headers.get("HX-Request"):
+        if result.status == 'SUCCESS':
+            return render(request, "ai_crew/partials/status_done.html", {"task": result.result})
+        
+        elif result.status == 'FAILURE' or result.status == 'REVOKED':
+            error_task = {"status": "error", "error": f"Task failed: {result.result}"}
+            return render(request, "ai_crew/partials/status_error.html", {"task": error_task})
+        
+        else:
+            # Still running or pending
+            progress = 5
+            message = "Initializing..."
+            start_time = time.time() * 1000 # Fallback
+            
+            logs = []
+            if result.info and isinstance(result.info, dict):
+                progress = result.info.get('progress', 5)
+                message = result.info.get('message', 'Processing...')
+                start_time = result.info.get('start_time', start_time)
+                logs = result.info.get('logs', [])
+
+            return render(request, "ai_crew/partials/status_running.html", {
+                "task_id": task_id,
+                "progress": progress,
+                "message": message,
+                "start_time": start_time,
+                "logs": logs
+            })
+
+    return JsonResponse(response_data)

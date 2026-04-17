@@ -157,6 +157,8 @@ Comment:   id, post (FK), author_name, author_email,
 | Tagging | django-taggit | 5.x | Industry standard Django tagging |
 | Static files | WhiteNoise | 6.x | Zero-config static serving |
 | Frontend | TailwindCSS (CDN) | 3.x | Utility-first, no build step for v1 |
+| Dynamic UI | HTMX | 2.0.8 | Declarative AJAX, polling, and partial updates |
+| Micro-Interactions| Hyperscript | 0.9.91 | Hyper-declarative UI micro-scripting |
 | Fonts | Playfair Display + IBM Plex Serif | — | Editorial, distinctive, monochrome-fit |
 
 ---
@@ -177,14 +179,15 @@ Comment:   id, post (FK), author_name, author_email,
 - Post view counts use `F()` expressions (atomic increment, no race condition)
 - Database indexes on `(status, published_at)` and `slug` for fast listing queries
 - WhiteNoise + `CompressedManifestStaticFilesStorage` for production static files
-- CrewAI runs synchronously in the web process for v1 (acceptable for staff-only use); v2 should use Celery for async generation
+- CrewAI runs in **daemon background threads** (`threading.Thread`) controlled by a `lock` for thread safety. This prevents HTTP timeouts during long LLM runs without requiring a full Celery/Redis infrastructure.
 
 ---
 
 ## 8. Future Considerations (v2)
 
-- [ ] Celery + Redis for async CrewAI execution with real-time progress updates
-- [ ] Newsletter integration (Mailchimp or self-hosted)
+- [x] HTMX + Hyperscript integration for dynamic UI
+- [x] Background generation using threading (ADR-006)
+- [ ] Celery + Redis for deep scalability (production grade)
 - [ ] Image generation agent (DALL-E tool for cover images)
 - [ ] TailwindCSS PostCSS build pipeline (replace CDN)
 - [ ] Full-text search via PostgreSQL `tsvector` or Meilisearch
