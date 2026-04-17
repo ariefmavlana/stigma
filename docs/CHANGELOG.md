@@ -11,6 +11,8 @@ All notable changes to the STIgma project will be documented in this file.
 - **Infinite Scroll**: Modernized `post_list.html` to automatically load older posts on scroll (`hx-trigger="revealed"`) via DOM appending.
 - **Real-Time Commenting**: Re-engineered the discussion section (`post_detail.html`) to submit and append comments asynchronously via `hx-post` and dynamic HTML partials.
 - **Live Search Overlay**: Refactored the Hyperscript search bar to immediately stream search results via `hx-get` into a floating dropdown on `keyup`.
+- **Cross-Lingual Guardrails [ADR-012]**: Injected explicit translation boundaries to AI tasks, resolving `504 Gateway Timeouts` masking as JSON syntax failures when generating non-English content.
+- **Dual-Configuration CrewAI System**: Re-engineered `agents.yaml` and `tasks.yaml` into separated `_en` and `_id` localization files, enabling 100% native Indonesian language AI reasoning and logic tracking without sacrificing multi-lingual dynamic generation.
 - **NYT-Style Editorial Frontend**: Completely redesigned the `home.html` to mirror a 3-column newspaper grid layout with clear dividing rules and removed modern card aesthetics.
 - **Refined Reading Experience**: Narrowed the `post_list.html` width constraint down to `max-w-4xl` for an enhanced, focused reading journey.
 - **Target Audience Dynamic Select**: Shifted the generic audience text input to a powerful HTML5 `<datalist>` supporting custom typings alongside curated demographics.

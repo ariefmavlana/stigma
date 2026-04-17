@@ -1,29 +1,31 @@
 <div id="status-panel" 
-     class="mt-10 border-2 border-red-600 bg-white shadow-[8px_8px_0px_0px_rgba(220,38,38,0.1)] p-8 overflow-hidden"
+     class="mt-8 sm:mt-10 border-2 border-red-600 bg-white shadow-[8px_8px_0px_0px_rgba(220,38,38,0.1)] p-5 sm:p-8 overflow-hidden"
      _="on load transition my opacity from 0 to 1 over 400ms">
     
     <div class="flex items-center gap-3 mb-6 border-b border-red-100 pb-4">
-        <div class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-        <p class="font-mono text-xs tracking-[0.2em] uppercase text-red-600 font-bold">Execution Terminated</p>
+        <div class="w-2 h-2 bg-red-600 rounded-full animate-pulse flex-shrink-0"></div>
+        <p class="font-mono text-[10px] sm:text-xs tracking-[0.2em] uppercase text-red-600 font-bold">
+            Eksekusi Terhenti / Execution Terminated
+        </p>
     </div>
 
     <div class="mb-6">
-        <p class="font-mono text-[10px] uppercase text-ink-400 mb-2">Error Detail</p>
-        <div class="bg-red-50 border-l-4 border-red-600 p-4">
-            <p class="font-mono text-sm text-red-900 leading-relaxed font-bold">
-                {{ task.error|default:"The AI pipeline encountered an unexpected interruption. This is often due to API rate limits or LLM context issues." }}
+        <p class="font-mono text-[10px] uppercase text-ink-400 mb-2">Detail Error / Error Detail</p>
+        <div class="bg-red-50 border-l-4 border-red-600 p-3 sm:p-4">
+            <p class="font-mono text-xs sm:text-sm text-red-900 leading-relaxed font-bold break-words">
+                {{ task.error|default:"Pipeline AI mengalami gangguan tak terduga. Biasanya disebabkan oleh batas rate API atau masalah konteks LLM. / The AI pipeline encountered an unexpected interruption." }}
             </p>
         </div>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
         <button _="on click reload() the location"
-                class="bg-ink-950 text-white font-mono text-xs tracking-widest uppercase px-6 py-3 hover:bg-ink-700 transition-colors">
-            Reset & Retry
+                class="bg-ink-950 text-white font-mono text-xs tracking-widest uppercase px-6 py-3 hover:bg-ink-700 transition-colors text-center">
+            Reset & Coba Lagi / Reset & Retry
         </button>
         <a href="/admin/blog/post/" 
-           class="font-mono text-[10px] text-ink-400 hover:text-ink-900 uppercase tracking-widest transition-colors">
-            Check Archives →
+           class="font-mono text-[10px] text-ink-400 hover:text-ink-900 uppercase tracking-widest transition-colors text-center py-2">
+            Periksa Arsip / Check Archives →
         </a>
     </div>
 </div>

@@ -1,33 +1,38 @@
 {% extends "base.html" %}
-{% block title %}AI Post Generator{% endblock %}
+{% block title %}AI Generation Engine — Mesin Generasi Konten{% endblock %}
 
 {% block content %}
-<div class="max-w-[1400px] mx-auto px-6 py-12 md:py-16" _="on load transition my opacity from 0 to 1 over 500ms">
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-8 md:py-16" _="on load transition my opacity from 0 to 1 over 500ms">
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
     
     <!-- ── Left Column: Form ────────────────────────────────────────────────── -->
     <div class="lg:col-span-7">
       <div class="border-b-4 border-ink-950 pb-8 mb-8" id="form-container">
-        <div class="flex items-center gap-3 mb-4">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
           <span class="font-mono text-[10px] tracking-widest uppercase font-bold text-ink-950 bg-ink-200 px-2 py-0.5">
-            Internal Platform
+            Platform Internal
           </span>
           <span class="font-mono text-[10px] tracking-[0.2em] font-bold text-white bg-ink-950 px-2 py-0.5">
-            ✦ CrewAI Pipeline v2.0
+            ✦ CrewAI Pipeline v2.1
           </span>
         </div>
-        <h1 class="font-display text-5xl md:text-6xl font-black text-ink-950 leading-none tracking-tight mb-8">
-          AI Generation <br/>Engine
+        <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-black text-ink-950 leading-none tracking-tight mb-2">
+          AI Generation <br class="hidden sm:block"/>Engine
         </h1>
+        <p class="font-mono text-xs text-ink-400 tracking-wider uppercase mb-8">
+          Mesin Generasi Konten Otomatis &mdash; Bilingual Pipeline
+        </p>
 
+        <!-- Audience Datalist (bilingual suggestions) -->
         <datalist id="audience_list">
+          <option value="Pembaca cerdas yang tertarik dengan teknologi dan ide-ide baru"></option>
           <option value="Curious, intelligent readers interested in technology and ideas"></option>
-          <option value="Software developers and engineering leaders"></option>
-          <option value="Startup founders and tech entrepreneurs"></option>
-          <option value="General public (easy to understand)"></option>
-          <option value="Akademisi dan mahasiswa (Academic/Students)"></option>
-          <option value="Profesional IT dan pemerhati teknologi"></option>
+          <option value="Developer dan pemimpin engineering / Software developers and engineering leaders"></option>
+          <option value="Founder startup dan entrepreneur teknologi / Startup founders and tech entrepreneurs"></option>
+          <option value="Masyarakat umum (mudah dipahami) / General public (easy to understand)"></option>
+          <option value="Akademisi dan mahasiswa / Academics and students"></option>
+          <option value="Profesional IT dan pemerhati teknologi / IT professionals and tech enthusiasts"></option>
         </datalist>
 
         <form id="generate-form" 
@@ -39,12 +44,12 @@
                  transition #form-container opacity to 0.4 over 300ms 
                  then add .pointer-events-none to me
                  remove .hidden from #status-panel"
-              class="space-y-6 {% if active_task_id %}hidden{% endif %}">
+              class="space-y-5 sm:space-y-6 {% if active_task_id %}hidden{% endif %}">
           {% csrf_token %}
 
           {% for field in form %}
           <div class="group border-t border-ink-200 pt-4">
-            <label class="block font-mono text-[10px] tracking-widest uppercase font-bold text-ink-900 mb-2">
+            <label for="{{ field.id_for_label }}" class="block font-mono text-[10px] tracking-widest uppercase font-bold text-ink-900 mb-2">
               {{ field.label }}
               {% if field.field.required %}<span class="text-ink-400 font-normal ml-1">#REQ</span>{% endif %}
             </label>
@@ -58,15 +63,17 @@
           </div>
           {% endfor %}
 
-          <div class="pt-8">
+          <div class="pt-6 sm:pt-8">
             <button type="submit" id="submit-btn"
-                    class="w-full bg-ink-950 text-white py-4 transition-colors hover:bg-ink-700">
-              <span class="font-mono text-[11px] tracking-widest uppercase font-bold">
-                Deploy Pipeline →
+                    class="w-full bg-ink-950 text-white py-4 transition-all duration-300 hover:bg-ink-700 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] active:translate-y-0.5 active:shadow-none relative overflow-hidden group">
+              <span class="font-mono text-[11px] tracking-widest uppercase font-bold relative z-10" id="submit-label">
+                Jalankan Pipeline →
               </span>
+              <!-- Shimmer effect on hover -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
             </button>
             <p class="font-mono text-[9px] text-center text-ink-400 mt-3 uppercase tracking-widest font-bold">
-              Average duration: ~120s. Results saved as unpublished drafts.
+              Durasi rata-rata: ~120 detik. Hasil disimpan sebagai draf.
             </p>
           </div>
         </form>
@@ -78,8 +85,8 @@
            hx-get="{% url 'ai_crew:task_status' active_task_id %}" 
            hx-trigger="load" 
            hx-swap="outerHTML"
-           class="mt-10 border border-ink-950 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] p-6 text-center animate-pulse">
-          <p class="font-mono text-xs uppercase tracking-widest font-bold text-ink-500">Resuming active pipeline connection...</p>
+           class="mt-8 sm:mt-10 border border-ink-950 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] p-6 text-center animate-pulse">
+          <p class="font-mono text-xs uppercase tracking-widest font-bold text-ink-500">Menghubungkan kembali ke pipeline aktif... / Resuming active pipeline connection...</p>
       </div>
       {% else %}
       <div id="status-panel" class="hidden"></div>
@@ -87,69 +94,167 @@
     </div>
 
     <!-- ── Right Column: Pipeline Details & History ───────────────────────── -->
-    <div class="lg:col-span-5 lg:pl-12 lg:border-l border-ink-200">
+    <div class="lg:col-span-5 lg:pl-8 xl:pl-12 lg:border-l border-ink-200">
       
-      <!-- ── Agent Pipeline ───────────────────────────────────────────────── -->
-      <div class="mb-12">
-        <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950 border-b border-ink-950 pb-2 mb-6">Orchestration</p>
-        
-        <div class="space-y-4">
-          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
-            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 01</div>
-            <p class="font-display text-xl font-bold text-ink-950 mb-1">Researcher</p>
-            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Tools: SerperDev + WebRAG</p>
-          </div>
-          
-          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
-            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 02</div>
-            <p class="font-display text-xl font-bold text-ink-950 mb-1">Writer</p>
-            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Target: Markdown_v2 · 1.2k words</p>
-          </div>
-          
-          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
-            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 03</div>
-            <p class="font-display text-xl font-bold text-ink-950 mb-1">Editor</p>
-            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Audit: SEO Audit & Structure</p>
-          </div>
-        </div>
-      </div>
+      <!-- ── Mobile Toggle for Orchestration ─────────────────────────────── -->
+      <button class="lg:hidden w-full flex items-center justify-between border border-ink-200 px-4 py-3 mb-4 bg-white hover:bg-ink-50 transition-colors"
+              _="on click toggle .hidden on #orchestration-content then toggle .rotate-180 on #chevron-icon">
+        <span class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950">Orchestration & History</span>
+        <svg id="chevron-icon" class="w-4 h-4 text-ink-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
 
-      <!-- ── Recent Activity ──────────────────────────────────────────────── -->
-      {% if recent_ai_posts %}
-      <div>
-        <div class="flex items-baseline justify-between border-b border-ink-950 pb-2 mb-6">
-          <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950">Recent Artifacts</p>
-        </div>
-        
-        <ul class="space-y-4">
-          {% for post in recent_ai_posts %}
-          <li class="border-b border-ink-200 pb-4 last:border-0">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="inline-block w-2 h-2 rounded-full {% if post.status == 'published' %}bg-ink-950{% else %}border border-ink-400 bg-white{% endif %}"></span>
-              <span class="font-mono text-[9px] tracking-widest uppercase font-bold text-ink-500">{{ post.status }}</span>
-              <a href="/admin/blog/post/{{ post.pk }}/change/" class="ml-auto font-mono text-[9px] tracking-widest font-bold text-ink-950 hover:underline uppercase">Edit →</a>
+      <div id="orchestration-content" class="hidden lg:block">
+        <!-- ── Agent Pipeline ───────────────────────────────────────────────── -->
+        <div class="mb-8 lg:mb-12">
+          <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950 border-b border-ink-950 pb-2 mb-6">
+            Orkestrasi / Orchestration
+          </p>
+          
+          <div class="space-y-0">
+            <!-- Stage 1: Researcher -->
+            <div class="pipeline-card border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-all duration-300 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)]">
+              <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Tahap 01</div>
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🔍</span>
+                <div>
+                  <p class="font-display text-lg sm:text-xl font-bold text-ink-950 mb-0.5">Researcher</p>
+                  <p class="font-mono text-[10px] tracking-wide text-ink-500 uppercase font-bold">Periset Topik &middot; SerperDev + WebRAG</p>
+                </div>
+              </div>
             </div>
-            <p class="font-body text-sm font-bold text-ink-900 line-clamp-2">
-              {{ post.title }}
-            </p>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
+            
+            <!-- Connector -->
+            <div class="flex justify-center py-1">
+              <div class="w-px h-6 bg-ink-300 relative">
+                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-ink-300"></div>
+              </div>
+            </div>
+            
+            <!-- Stage 2: Writer -->
+            <div class="pipeline-card border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-all duration-300 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)]">
+              <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Tahap 02</div>
+              <div class="flex items-center gap-3">
+                <span class="text-xl">✍️</span>
+                <div>
+                  <p class="font-display text-lg sm:text-xl font-bold text-ink-950 mb-0.5">Writer</p>
+                  <p class="font-mono text-[10px] tracking-wide text-ink-500 uppercase font-bold">Penulis Konten &middot; Markdown · 800–1200 kata</p>
+                </div>
+              </div>
+            </div>
 
+            <!-- Connector -->
+            <div class="flex justify-center py-1">
+              <div class="w-px h-6 bg-ink-300 relative">
+                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-ink-300"></div>
+              </div>
+            </div>
+            
+            <!-- Stage 3: Editor -->
+            <div class="pipeline-card border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-all duration-300 bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.05)]">
+              <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Tahap 03</div>
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🎯</span>
+                <div>
+                  <p class="font-display text-lg sm:text-xl font-bold text-ink-950 mb-0.5">Editor</p>
+                  <p class="font-mono text-[10px] tracking-wide text-ink-500 uppercase font-bold">Editor & SEO &middot; Audit Struktur & JSON</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Recent Activity ──────────────────────────────────────────────── -->
+        {% if recent_ai_posts %}
+        <div>
+          <div class="flex items-baseline justify-between border-b border-ink-950 pb-2 mb-6">
+            <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950">Artefak Terbaru / Recent</p>
+          </div>
+          
+          <ul class="space-y-3 sm:space-y-4">
+            {% for post in recent_ai_posts %}
+            <li class="border-b border-ink-200 pb-3 sm:pb-4 last:border-0 group">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block w-2 h-2 rounded-full flex-shrink-0 {% if post.status == 'published' %}bg-ink-950{% else %}border border-ink-400 bg-white{% endif %}"></span>
+                <span class="font-mono text-[9px] tracking-widest uppercase font-bold text-ink-500">{{ post.status }}</span>
+                <a href="/admin/blog/post/{{ post.pk }}/change/" class="ml-auto font-mono text-[9px] tracking-widest font-bold text-ink-950 hover:underline uppercase opacity-0 group-hover:opacity-100 transition-opacity">Edit →</a>
+              </div>
+              <p class="font-body text-sm font-bold text-ink-900 line-clamp-2">
+                {{ post.title }}
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
     </div>
 
   </div>
 </div>
 
+<!-- ── Language-aware dynamic switching ────────────────────────────────────── -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const langSelect = document.getElementById('id_language');
+    const submitLabel = document.getElementById('submit-label');
+    const topicInput = document.getElementById('id_topic');
+    
+    if (langSelect) {
+      langSelect.addEventListener('change', function() {
+        const isID = this.value === 'Indonesian';
+        
+        // Update submit button label
+        if (submitLabel) {
+          submitLabel.textContent = isID ? 'Jalankan Pipeline →' : 'Deploy Pipeline →';
+        }
+        
+        // Update topic placeholder
+        if (topicInput) {
+          topicInput.placeholder = isID 
+            ? 'contoh: Masa Depan Edge Computing di 2026'
+            : 'e.g. The Rise of Edge Computing in 2026';
+        }
+      });
+    }
+  });
+</script>
+
 <style>
   /* Form Element Overrides matching the CMS aesthetic */
   form input[type="text"], form select, form textarea {
-    @apply w-full border-none border-b-2 border-ink-300 bg-transparent px-0 py-2 font-body text-lg transition-all duration-200 rounded-none shadow-none focus:ring-0 focus:border-ink-950;
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid var(--ink-300);
+    background: transparent;
+    padding: 0.5rem 0;
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+  }
+  @media (min-width: 640px) {
+    form input[type="text"], form select, form textarea {
+      font-size: 1.125rem;
+    }
+  }
+  form input[type="text"]:focus, form select:focus, form textarea:focus {
+    border-bottom-color: var(--ink-950);
+    box-shadow: none;
   }
   form textarea {
     min-height: 120px;
+  }
+  
+  /* Pipeline card hover lift */
+  .pipeline-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .pipeline-card:hover {
+    transform: translateX(4px);
   }
 </style>
 {% endblock %}

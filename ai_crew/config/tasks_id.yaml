@@ -1,0 +1,91 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# STIgma — CrewAI Task Definitions (Bahasa Indonesia)
+# Sequential process: research → write → edit
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ── Task 1: Deep Research ────────────────────────────────────────────────────
+research_task:
+  description: >
+    Lakukan riset untuk topik blog: "{topic}"
+
+    Lakukan penelusuran secara menyeluruh dan hasilkan ringkasan riset terstruktur yang mencakup:
+
+    1. **Konsep Inti** — Apa itu {topic} dalam istilah sederhana? Mengapa itu penting sekarang?
+    2. **Fakta & Data Utama** — 5–7 fakta atau statistik paling menarik dan dapat dikutip.
+    3. **Tren Saat Ini** — Apa yang sedang terjadi di ranah ini sekarang (2026)?
+    4. **Sudut Pandang Berlawanan/Mengejutkan** — Apa yang paling sering dilewatkan atau dipahami secara salah oleh kebanyakan konten?
+    5. **Kisah Manusia** — Contoh nyata, studi kasus, atau anekdot.
+    6. **Pertanyaan Umum** — Apa yang paling sering ditanyakan orang tentang {topic}?
+    7. **Sumber** — Cantumkan sumber paling kredibel yang ditemukan.
+
+    Target audiens: {target_audience}
+    Panduan gaya (Tone): {tone}
+    Bahasa: Ringkasan riset yang dihasilkan harus dalam bahasa {language}.
+    
+    Bersikap tangguhlah. Jika Anda tidak dapat memverifikasi suatu fakta, tandai sebagai [TIDAK TERVERIFIKASI].
+  expected_output: >
+    Ringkasan riset berformat Markdown terstruktur ditulis dalam {language} di mana ke-7 bagian terisi penuh. 
+    Minimum 400 kata. Sertakan setidaknya referensi ke 3 sumber eksternal. 
+    Secara spesifik — generalisasi yang tidak jelas tidak ada nilainya bagi penulis.
+  agent: topic_researcher
+
+# ── Task 2: Write Draft ──────────────────────────────────────────────────────
+write_task:
+  description: >
+    Menggunakan ringkasan riset yang disediakan, tulis postingan blog yang menarik mengenai "{topic}".
+
+    Persyaratan:
+    - **Panjang**: 800–1200 kata
+    - **Format**: Markdown Bersih (gunakan ##, ###, cetak tebal, list sesuai kebutuhan)
+    - **Pembuka**: Paragraf pertama harus segera memikat pembaca — mulai dengan fakta mengejutkan, pertanyaan provokatif, atau skenario yang nyata. Jangan pernah memulai dengan basa-basi seperti "Di dunia masa kini..."
+    - **Struktur**: Aliran alami dengan 3–5 bagian. Setiap bagian harus memajukan narasi, bukan mengulangi konten sebelumnya.
+    - **Penutup**: Akhiri dengan wawasan atau ajakan berefleksi, bukan ringkasan.
+    - **Suara/Tone**: Implementasikan nuansa {tone}
+    - **Bahasa**: HARUS ditulis secara jelas dalam bahasa {language}.
+    - **Target Audiens/Pembaca**: Eksekusi gaya yang cocok untuk {target_audience}.
+    - **Tanpa Basa-basi**: Singkirkan kalimat apapun yang jika dihapus tidak akan menghilangkan makna.
+
+    PENTING: Jangan campurkan bahasa pada penulisan final Anda.
+    Konteks dari riset: gunakan semua fakta utama dan sudut pandang yang mengejutkan.
+  expected_output: >
+    Sebuah posting blog lengkap dalam format Markdown dalam bahasa {language}, 800-1200 kata. 
+    Terstruktur dengan baik serta memiliki tajuk/header yang jelas. Pembukaan kuat, isi logis, penutup tak terlupakan.
+  agent: content_writer
+  context:
+    - research_task
+
+# ── Task 3: Edit & Finalise ──────────────────────────────────────────────────
+edit_task:
+  description: >
+    Edit dan finalisasi draf blog mengenai "{topic}" agar siap dipublikasi.
+
+    Tugas Anda:
+    1. **Poles Prosa** — Perbaiki susunan kalimat canggung, dan perbaiki transisi. Pertahankan gaya tulisan si penulis asli.
+    2. **Optimasi SEO** — Pastikan kata kunci utama "{topic}" muncul secara alami di: Judul H1, 100 kata pertama, setidaknya 2 sub-judul, dan di dalam deskripsi meta.
+    3. **Pengecekan Fakta** — Validasi klaim terhadap isi ringkasan riset. Singkirkan item yang ditandai [TIDAK TERVERIFIKASI] — singkirkan atau kontekskan.
+    4. **Tautan Internal Otomatis** — Gunakan `search_blog_tool` untuk menemukan 2-3 postingan blog existing di dalam database kita yang terkait. Masukkan dan integrasikan tautan tersebut secara natural ke dalam body posting menggunakan format Markdown: `[Judul Post](/posts/slug/)`.
+    5. **Tinjauan Struktur** — Apakah paragraf mengalir logis? Berapa rasio ukurannya?
+    
+    Kemudian, output akhirnya buat menjadi **objek JSON yang valid** persis dengan skema berikut:
+    {{
+      "title": "Judul final postingan (maks 70 karakter, teroptimasi SEO)",
+      "meta_description": "Deskripsi meta 155 karakter memuat keyword utama",
+      "excerpt": "Ringkasan 1-2 kalimat untuk halaman daftar post (maks 280 karakter)",
+      "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+      "reading_time_minutes": <angka_integer>,
+      "body": "Isi lengkap dari postingan dengan format Markdown (dengan escape karakter JSON)",
+      "social_twitter": ["Tweet 1", "Tweet 2", "Tweet 3"],
+      "social_linkedin": "Ringkasan profesional untuk LinkedIn beserta hashtags",
+      "newsletter_copy": "Ringkasan padat dan menarik untuk dikirim via newsletter"
+    }}
+
+    KRITIKAL: Keluarkan HANYA objek JSON yang valid. Jangan keluarkan markdown fences (```json ... ```).
+    TIDAK BOLEH menuliskan prolog atau intermezzo kalimat sebelum JSON.
+    *Key* JSON (kunci parameter) di atas HARUS tetap dibiarkan persis dalam Bahasa Inggris agar bisa diekstrak oleh sistem API.
+    Isi nilai *(values)* dari JSON harus menggunakan bahasa {language}. Harap teliti terhadap penggunaan escapes karakter kutip di dalam tubuh tulisan agar tidak merusak struktur JSON!
+  expected_output: >
+    Sebuah objek JSON TUNGGAL dan valid. Key harus menggunakan Bahasa Inggris. Valuenya diterjemahkan ke bahasa {language}. Field body harus berisikan hasil post berupa Markdown utuh. Segala format field direkayasa agar valid lolos standar JSON.
+  agent: content_editor
+  context:
+    - research_task
+    - write_task

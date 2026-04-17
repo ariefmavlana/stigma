@@ -21,10 +21,11 @@ research_task:
     Target audience: {target_audience}
     Tone guidance: {tone}
     Language: The generated research brief should be in {language}.
+    IMPORTANT: If {topic} is in a different language than {language}, you may translate your search queries internally to find the most accurate facts, but the final brief MUST be written strictly in {language}.
     
     Be rigorous. If you cannot verify a fact, mark it as [UNVERIFIED].
   expected_output: >
-    A structured Markdown research brief with all 7 sections filled out.
+    A structured Markdown research brief written in {language} with all 7 sections filled out.
     Minimum 400 words. Include at least 3 external source references.
     Be specific — vague generalities are worthless to the writer.
   agent: topic_researcher
@@ -45,12 +46,14 @@ write_task:
     - **Closing**: End with an insight or a call-to-reflection, not a summary list.
     - **Voice**: {tone}
     - **Language**: MUST clearly be written in {language}.
-    - **Audience**: {target_audience}
+    - **Audience**: Execute concepts suitable for {target_audience}.
     - **No fluff**: Remove any sentence that could be deleted without losing meaning.
 
+    CRITICAL: You are to understand the {tone} and {target_audience} instructions conceptually, but physically write the contents strictly in {language}. Do not mix languages in the final output.
+    
     Context from research: use all key facts and the surprising angle.
   expected_output: >
-    A complete blog post in Markdown format, 800–1200 words.
+    A complete blog post in Markdown format written in {language}, 800–1200 words.
     Well-structured with clear headers. Strong opening, coherent body,
     memorable closing. No meta-commentary ("In this post, I will...").
   agent: content_writer
@@ -89,10 +92,13 @@ edit_task:
       "newsletter_copy": "A condensed, punchy summary for email newsletters"
     }}
 
-    CRITICAL: Output ONLY the JSON object. No preamble, no explanation, no
-    Markdown fences. Just the raw JSON. Ensure the content language strictly matches {language}.
+    CRITICAL: Output ONLY a valid JSON object matching the schema above.
+    Do NOT output markdown fences (```json ... ```).
+    Do NOT output conversational preambles (e.g., "Here is the result...").
+    The JSON *keys* MUST remain exactly as written above in English to pass schema validation.
+    The JSON *values* MUST be written in {language}. Be extremely careful with escaping quotes inside your JSON logic.
   expected_output: >
-    A single, valid JSON object matching the schema above.
+    A single, valid JSON object. Keys must be in English. Values must be translated to {language}.
     The body field contains the complete polished Markdown post.
     All string fields are properly JSON-escaped.
   agent: content_editor

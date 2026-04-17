@@ -1,23 +1,23 @@
 """
 STIgma — BlogWriterCrew
 ────────────────────────
-LLM Backend: NVIDIA Nemotron via NVIDIA NIM (OpenAI-compatible).
-CrewAI uses LiteLLM internally — the "openai/" prefix routes calls
-through the OpenAI adapter pointed at NVIDIA's base_url.
+LLM Backend: NVIDIA NIM (OpenAI-compatible endpoint).
+Model: moonshotai/kimi-k2-instruct-0905
 
 Performance settings:
-  - reasoning_budget capped at 4096 (was 8192) for faster responses
-  - max_tokens 8192 — sufficient for 1200-word posts
-  - max_iter: 3 for researcher, 5 for others
-  - max_execution_time: 900s for researcher, 600s for others
+  - Single shared LLM instance (built once, used by all agents)
+  - verbose=False everywhere (no I/O overhead)
+  - max_iter: 3 for all agents (tight cap)
+  - max_execution_time: 900s researcher, 600s writer/editor
 
 Agents (sequential):
-  1. topic_researcher  — SerperDevTool + WebsiteSearchTool
+  1. topic_researcher  — SerperDevTool web search
   2. content_writer    — Markdown draft from research
   3. content_editor    — Polish + SEO + structured JSON output
 """
 
 import os
+from functools import lru_cache
 
 from crewai import Agent, Crew, LLM, Process, Task
 from crewai.project import CrewBase, agent, crew, task
@@ -26,32 +26,33 @@ from crewai_tools import SerperDevTool
 from django.conf import settings
 
 
-def _build_llm() -> LLM:
+@lru_cache(maxsize=4)
+def _build_llm(model_name: str, api_key: str) -> LLM:
     """
     Build a CrewAI LLM instance pointing at NVIDIA NIM.
-    Optimised for speed: reduced token budgets, no unnecessary retries.
+    lru_cache ensures the same (model, key) combination produces
+    exactly one LLM instance for the lifetime of the worker process.
     """
+    return LLM(
+        model=f"openai/{model_name}",
+        base_url="https://integrate.api.nvidia.com/v1",
+        api_key=api_key,
+        temperature=0.6,
+        top_p=0.9,
+        max_tokens=4096,
+    )
+
+
+def _get_llm() -> LLM:
+    """Resolve config and return a cached LLM instance."""
     api_key = getattr(settings, "NVIDIA_API_KEY", "") or os.getenv("NVIDIA_API_KEY", "")
     if not api_key:
         raise EnvironmentError(
             "NVIDIA_API_KEY is not set. Add it to your .env file.\n"
             "Get a key at https://integrate.api.nvidia.com"
         )
-
-    model_name = getattr(
-        settings,
-        "CREWAI_LLM_MODEL",
-        "nvidia/nemotron-3-super-120b-a12b",
-    )
-
-    return LLM(
-        model=f"openai/{model_name}",
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key=api_key,
-        temperature=1,
-        top_p=0.95,
-        max_tokens=4096,
-    )
+    model_name = getattr(settings, "CREWAI_LLM_MODEL", "meta/llama-3.1-8b-instruct")
+    return _build_llm(model_name, api_key)
 
 
 def _get_search_tool() -> SerperDevTool:
@@ -64,7 +65,6 @@ def _get_search_tool() -> SerperDevTool:
     return SerperDevTool()
 
 
-
 @CrewBase
 class BlogWriterCrew:
     """
@@ -75,30 +75,31 @@ class BlogWriterCrew:
             "topic": "The Future of Quantum Computing",
             "target_audience": "Curious tech enthusiasts",
             "tone": "Intelligent, engaging, slightly informal",
+            "language": "English",
         })
     """
 
-    agents_config = "config/agents.yaml"
-    tasks_config = "config/tasks.yaml"
+    agents_config = "config/agents_en.yaml"
+    tasks_config = "config/tasks_en.yaml"
 
     @agent
     def topic_researcher(self) -> Agent:
         return Agent(
             config=self.agents_config["topic_researcher"],  # type: ignore[index]
-            llm=_build_llm(),
+            llm=_get_llm(),
             tools=[_get_search_tool()],
-            verbose=True,
-            max_iter=3,              # reduced to 3 for faster research phase
-            max_execution_time=900,  # 15-minute cap for research
+            verbose=False,
+            max_iter=3,
+            max_execution_time=900,
         )
 
     @agent
     def content_writer(self) -> Agent:
         return Agent(
             config=self.agents_config["content_writer"],  # type: ignore[index]
-            llm=_build_llm(),
-            verbose=True,
-            max_iter=5,
+            llm=_get_llm(),
+            verbose=False,
+            max_iter=3,
             max_execution_time=600,
         )
 
@@ -107,10 +108,10 @@ class BlogWriterCrew:
         from .tools import SearchBlogTool
         return Agent(
             config=self.agents_config["content_editor"],  # type: ignore[index]
-            llm=_build_llm(),
+            llm=_get_llm(),
             tools=[SearchBlogTool()],
-            verbose=True,
-            max_iter=5,
+            verbose=False,
+            max_iter=3,
             max_execution_time=600,
         )
 
@@ -127,11 +128,20 @@ class BlogWriterCrew:
         return Task(config=self.tasks_config["edit_task"])  # type: ignore[index]
 
     @crew
-    def crew(self, step_callback=None) -> Crew:
+    def crew(self) -> Crew:
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=True,
-            step_callback=step_callback,
+            verbose=False,
         )
+
+
+@CrewBase
+class BlogWriterCrewID(BlogWriterCrew):
+    """
+    Indonesian localized instantiation of BlogWriterCrew.
+    Inherits all agent/task/crew definitions — only YAML configs differ.
+    """
+    agents_config = "config/agents_id.yaml"
+    tasks_config = "config/tasks_id.yaml"

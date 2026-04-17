@@ -1,6 +1,7 @@
 # ═══════════════════════════════════════════════════════════════════════════
 # STIgma — CrewAI Agent Definitions
 # Following official CrewAI @CrewBase YAML pattern (docs.crewai.com)
+# Note: verbose, max_iter, max_execution_time are controlled in crew.py
 # ═══════════════════════════════════════════════════════════════════════════
 
 # ── Agent 1: Topic Researcher ────────────────────────────────────────────────
@@ -22,9 +23,7 @@ topic_researcher:
     interesting threads, always looking for the human element behind any topic.
     Your research notes are legendary — structured, scannable, and dense with
     actionable insight.
-  verbose: true
   allow_delegation: false
-  max_iter: 3
 
 # ── Agent 2: Content Writer ──────────────────────────────────────────────────
 content_writer:
@@ -46,9 +45,7 @@ content_writer:
     your posts consistently rank because you write for humans, not algorithms.
     Your Markdown is clean and hierarchical, your prose is economical, and you
     never use filler phrases like "In conclusion" or "As we can see."
-  verbose: true
   allow_delegation: false
-  max_iter: 3
 
 # ── Agent 3: Content Editor ──────────────────────────────────────────────────
 content_editor:
@@ -72,6 +69,4 @@ content_editor:
     can parse your work programmatically. Your final edit always answers:
     "Would I share this? Would I finish reading this at midnight?" If not — back
     to the desk.
-  verbose: true
   allow_delegation: false
-  max_iter: 3

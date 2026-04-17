@@ -5,33 +5,33 @@ description = "STIgma — AI-powered blog platform built with Django & CrewAI"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-    "django>=4.2,<5.0",
-    "psycopg[binary]>=3.1.0",
-    "python-dotenv>=1.0.0",
-    "crewai[litellm]>=0.100.0",
-    "crewai-tools>=0.33.0",
-    "pillow>=10.0.0",
-    "django-markdownx>=4.0.0",
-    "markdown>=3.5.0",
-    "bleach>=6.0.0",
-    "django-taggit>=5.0.0",
-    "whitenoise>=6.6.0",
-    "gunicorn>=21.0.0",
-    "celery>=5.6.3",
-    "redis>=7.4.0",
+    "django>=6.0",
+    "psycopg[binary]",
+    "python-dotenv",
+    "crewai[litellm]",
+    "crewai-tools",
+    "pillow",
+    "django-markdownx",
+    "markdown",
+    "bleach",
+    "django-taggit",
+    "whitenoise",
+    "gunicorn",
+    "celery",
+    "redis",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = [
-    "django-debug-toolbar>=4.2.0",
-    "pytest-django>=4.7.0",
-    "pytest>=7.4.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
+[dependency-groups]
+dev = [
+    "django-debug-toolbar",
+    "pytest-django",
+    "pytest",
+    "black",
+    "ruff",
 ]
 
 [tool.ruff]

@@ -3,16 +3,16 @@ from blog.models import Category
 
 
 TONE_CHOICES = [
-    ("Intelligent and engaging, slightly informal", "Intelligent & Engaging"),
-    ("Academic and thorough, evidence-based", "Academic & Thorough"),
-    ("Conversational and friendly, storytelling-focused", "Conversational & Friendly"),
-    ("Bold and opinionated, thought-leadership style", "Bold & Opinionated"),
-    ("Technical and precise, developer-audience", "Technical & Precise"),
+    ("Intelligent and engaging, slightly informal", "Cerdas & Menarik / Intelligent & Engaging"),
+    ("Academic and thorough, evidence-based", "Akademis & Mendalam / Academic & Thorough"),
+    ("Conversational and friendly, storytelling-focused", "Santai & Bersahabat / Conversational & Friendly"),
+    ("Bold and opinionated, thought-leadership style", "Berani & Tegas / Bold & Opinionated"),
+    ("Technical and precise, developer-audience", "Teknis & Presisi / Technical & Precise"),
 ]
 
 LANGUAGE_CHOICES = [
-    ("Indonesian", "Bahasa Indonesia"),
-    ("English", "English"),
+    ("Indonesian", "🇮🇩 Bahasa Indonesia"),
+    ("English", "🇺🇸 English"),
 ]
 
 class GeneratePostForm(forms.Form):
@@ -20,41 +20,52 @@ class GeneratePostForm(forms.Form):
         max_length=200,
         widget=forms.TextInput(
             attrs={
-                "placeholder": "e.g. The Rise of Edge Computing in 2025",
+                "placeholder": "contoh: Masa Depan Edge Computing di 2026",
                 "class": "form-input",
                 "autofocus": True,
+                "id": "id_topic",
             }
         ),
-        label="Post Topic",
-        help_text="Be specific. The more precise the topic, the better the output.",
+        label="Topik Artikel / Post Topic",
+        help_text="Semakin spesifik topik, semakin baik hasilnya. / The more specific, the better.",
     )
     target_audience = forms.CharField(
         max_length=200,
-        initial="Curious, intelligent readers interested in technology and ideas",
+        initial="Pembaca cerdas yang tertarik dengan teknologi dan ide-ide baru",
         widget=forms.TextInput(
             attrs={
-                "placeholder": "e.g. Software developers, startup founders",
+                "placeholder": "contoh: Developer, founder startup, mahasiswa",
                 "class": "form-input",
                 "list": "audience_list",
+                "id": "id_target_audience",
             }
         ),
-        label="Target Audience",
+        label="Target Pembaca / Target Audience",
     )
     language = forms.ChoiceField(
         choices=LANGUAGE_CHOICES,
         initial="Indonesian",
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Language / Bahasa",
+        widget=forms.Select(attrs={
+            "class": "form-select",
+            "id": "id_language",
+        }),
+        label="Bahasa Output / Output Language",
     )
     tone = forms.ChoiceField(
         choices=TONE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Writing Tone",
+        widget=forms.Select(attrs={
+            "class": "form-select",
+            "id": "id_tone",
+        }),
+        label="Gaya Penulisan / Writing Tone",
     )
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),
         required=False,
-        empty_label="— No category —",
-        widget=forms.Select(attrs={"class": "form-select"}),
-        label="Assign Category (optional)",
+        empty_label="— Tanpa Kategori / No Category —",
+        widget=forms.Select(attrs={
+            "class": "form-select",
+            "id": "id_category",
+        }),
+        label="Kategori (opsional) / Category (optional)",
     )

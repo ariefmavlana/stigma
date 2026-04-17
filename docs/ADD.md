@@ -92,6 +92,7 @@ STIgma is a monochrome editorial blog platform that combines a robust Django bac
 ### 4.3 AI Agents & Custom Tools
 *   **SearchBlogTool**: A custom Django-ORM tool that allows the Editor agent to search the published post archive for internal linking opportunities.
 *   **Robust JSON Extraction**: Multi-stage Markdown stripping and regex-based trailing comma correction for resilient LLM response parsing.
+*   **Multi-Lingual ReAct Guardrails**: Decouples the English reasoning framework (roles, YAML prompts) from the execution output `{language}` natively in the tasks layer to eliminate context confusion and prevent JSON schema failures.
 
 ### 4.4 Monochrome Design System (STIgma Mono)
 *   **Unified Aesthetic**: A strict black-and-white visual language using varying weights of *Playfair Display* and *IBM Plex*.

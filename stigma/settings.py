@@ -110,9 +110,13 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
 ]
 
 # ── AI / CrewAI ─────────────────────────────────────────────────────────────
-CREWAI_LLM_MODEL = os.getenv("CREWAI_LLM_MODEL", "nvidia/nemotron-3-super-120b-a12b")
+# Default: fast 8B model — override in .env for heavier models
+CREWAI_LLM_MODEL = os.getenv("CREWAI_LLM_MODEL", "meta/llama-3.1-8b-instruct")
 NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "")
 SERPER_API_KEY = os.getenv("SERPER_API_KEY", "")
+
+# Site base URL — used to construct absolute post URLs in generation results
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 
 # ── Celery ──────────────────────────────────────────────────────────────────
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
@@ -122,7 +126,8 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_TASK_TIME_LIMIT = 30 * 60          # 30 minutes hard kill
+CELERY_RESULT_EXPIRES = 60 * 60 * 24     # Auto-purge results after 24h (prevent Redis bloat)
 
 # ── Blog Settings ────────────────────────────────────────────────────────────
 BLOG_POSTS_PER_PAGE = 9

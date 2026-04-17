@@ -2,17 +2,17 @@
      hx-get="{% url 'ai_crew:task_status' task_id %}" 
      hx-trigger="every 2s" 
      hx-swap="outerHTML"
-     class="mt-10 border border-ink-950 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-500"
+     class="mt-8 sm:mt-10 border border-ink-950 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-500"
      _="on load transition my opacity from 0 to 1 over 400ms">
     
     <!-- ── Header ────────────────────────────────────────────────────────── -->
-    <div class="bg-ink-950 px-6 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-            <p class="font-mono text-[10px] tracking-[0.2em] uppercase text-ink-200">System.Exec: AI_PIPELINE_STIGMA</p>
+    <div class="bg-ink-950 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse flex-shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></div>
+            <p class="font-mono text-[9px] sm:text-[10px] tracking-[0.15em] sm:tracking-[0.2em] uppercase text-ink-200 truncate">Pipeline Aktif / Active Pipeline</p>
         </div>
         <span id="elapsed-time" 
-              class="font-mono text-[10px] text-ink-400"
+              class="font-mono text-[11px] sm:text-xs text-emerald-300 font-bold tabular-nums flex-shrink-0 ml-2"
               _="on load repeat every 1s 
                  set elapsed to (Date.now() - {{ start_time }}) / 1000
                  set mins to Math.floor(elapsed / 60)
@@ -22,18 +22,87 @@
         </span>
     </div>
 
-    <div class="p-6">
-        <!-- ── Progress ────────────────────────────────────────────────────── -->
-        <div class="mb-8">
-            <div class="flex justify-between items-end mb-2">
-                <p class="font-mono text-xs text-ink-900 font-bold uppercase tracking-wider">{{ message|default:"Processing..." }}</p>
-                <p class="font-mono text-xs text-ink-400">{{ progress }}%</p>
+    <div class="p-4 sm:p-6">
+        <!-- ── Three-Stage Agent Pipeline ─────────────────────────────────── -->
+        <div class="mb-6 sm:mb-8">
+            <p class="font-mono text-[10px] uppercase text-ink-400 mb-3 sm:mb-4 tracking-widest">Status Agen / Agent Status</p>
+            
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0">
+                <!-- Stage 1: Researcher -->
+                <div class="flex-1 border {% if progress > 15 %}border-ink-950 bg-ink-950{% else %}border-ink-200 bg-ink-50{% endif %} p-3 sm:p-4 transition-all duration-500 relative overflow-hidden">
+                    {% if progress > 15 and progress <= 50 %}
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_ease_infinite]"></div>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mb-1 relative z-10">
+                        <span class="text-base sm:text-lg">🔍</span>
+                        <p class="font-mono text-[10px] sm:text-xs font-bold {% if progress > 15 %}text-white{% else %}text-ink-950{% endif %} uppercase tracking-wider">Researcher</p>
+                    </div>
+                    <p class="font-mono text-[9px] {% if progress > 15 %}text-ink-300{% else %}text-ink-400{% endif %} uppercase tracking-wide relative z-10">
+                        {% if progress > 50 %}✓ Selesai / Done{% elif progress > 15 %}⟳ Meneliti... / Researching...{% else %}◉ Menunggu / Waiting{% endif %}
+                    </p>
+                </div>
+                
+                <!-- Connector (horizontal on desktop, vertical on mobile) -->
+                <div class="hidden sm:flex items-center justify-center w-6 flex-shrink-0">
+                    <div class="h-px w-full {% if progress > 50 %}bg-ink-950{% else %}bg-ink-300{% endif %} relative">
+                        <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[3px] border-b-[3px] border-l-[5px] border-t-transparent border-b-transparent {% if progress > 50 %}border-l-ink-950{% else %}border-l-ink-300{% endif %}"></div>
+                    </div>
+                </div>
+                <div class="sm:hidden flex justify-center py-0.5">
+                    <div class="w-px h-3 {% if progress > 50 %}bg-ink-950{% else %}bg-ink-300{% endif %}"></div>
+                </div>
+                
+                <!-- Stage 2: Writer -->
+                <div class="flex-1 border {% if progress > 50 %}border-ink-950 bg-ink-950{% elif progress > 15 %}border-ink-400 bg-white{% else %}border-ink-200 bg-ink-50{% endif %} p-3 sm:p-4 transition-all duration-500 relative overflow-hidden">
+                    {% if progress > 50 and progress <= 80 %}
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_ease_infinite]"></div>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mb-1 relative z-10">
+                        <span class="text-base sm:text-lg">✍️</span>
+                        <p class="font-mono text-[10px] sm:text-xs font-bold {% if progress > 50 %}text-white{% else %}text-ink-950{% endif %} uppercase tracking-wider">Writer</p>
+                    </div>
+                    <p class="font-mono text-[9px] {% if progress > 50 %}text-ink-300{% elif progress > 15 %}text-ink-500{% else %}text-ink-400{% endif %} uppercase tracking-wide relative z-10">
+                        {% if progress > 80 %}✓ Selesai / Done{% elif progress > 50 %}⟳ Menulis... / Writing...{% elif progress > 15 %}◉ Antri / Queued{% else %}◉ Menunggu / Waiting{% endif %}
+                    </p>
+                </div>
+
+                <!-- Connector -->
+                <div class="hidden sm:flex items-center justify-center w-6 flex-shrink-0">
+                    <div class="h-px w-full {% if progress > 80 %}bg-ink-950{% else %}bg-ink-300{% endif %} relative">
+                        <div class="absolute -right-1 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[3px] border-b-[3px] border-l-[5px] border-t-transparent border-b-transparent {% if progress > 80 %}border-l-ink-950{% else %}border-l-ink-300{% endif %}"></div>
+                    </div>
+                </div>
+                <div class="sm:hidden flex justify-center py-0.5">
+                    <div class="w-px h-3 {% if progress > 80 %}bg-ink-950{% else %}bg-ink-300{% endif %}"></div>
+                </div>
+                
+                <!-- Stage 3: Editor -->
+                <div class="flex-1 border {% if progress > 80 %}border-ink-950 bg-ink-950{% elif progress > 50 %}border-ink-400 bg-white{% else %}border-ink-200 bg-ink-50{% endif %} p-3 sm:p-4 transition-all duration-500 relative overflow-hidden">
+                    {% if progress > 80 and progress < 98 %}
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-[shimmer_2s_ease_infinite]"></div>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mb-1 relative z-10">
+                        <span class="text-base sm:text-lg">🎯</span>
+                        <p class="font-mono text-[10px] sm:text-xs font-bold {% if progress > 80 %}text-white{% else %}text-ink-950{% endif %} uppercase tracking-wider">Editor</p>
+                    </div>
+                    <p class="font-mono text-[9px] {% if progress > 80 %}text-ink-300{% elif progress > 50 %}text-ink-500{% else %}text-ink-400{% endif %} uppercase tracking-wide relative z-10">
+                        {% if progress > 88 %}⟳ Menyunting... / Editing...{% elif progress > 80 %}⟳ Dimulai... / Starting...{% elif progress > 50 %}◉ Antri / Queued{% else %}◉ Menunggu / Waiting{% endif %}
+                    </p>
+                </div>
             </div>
-            <div class="bg-ink-100 h-1.5 w-full relative overflow-hidden">
+        </div>
+
+        <!-- ── Progress Bar ──────────────────────────────────────────────── -->
+        <div class="mb-6 sm:mb-8">
+            <div class="flex justify-between items-end mb-2">
+                <p class="font-mono text-[10px] sm:text-xs text-ink-900 font-bold uppercase tracking-wider truncate mr-2">{{ message|default:"Memproses... / Processing..." }}</p>
+                <p class="font-mono text-xs text-ink-400 font-bold tabular-nums flex-shrink-0">{{ progress }}%</p>
+            </div>
+            <div class="bg-ink-100 h-2 w-full relative overflow-hidden rounded-sm">
                 <!-- Scanning Effect Overlay -->
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-20 animate-[scan_2s_linear_infinite] z-10"></div>
                 <div id="progress-bar" 
-                     class="h-full bg-ink-950 transition-all duration-700 ease-out relative" 
+                     class="h-full bg-gradient-to-r from-ink-800 to-ink-950 transition-all duration-700 ease-out relative" 
                      style="width: {{ progress }}%"
                      _="on load set :pct to {{ progress }} 
                         repeat every 1s 
@@ -46,50 +115,35 @@
         </div>
 
         <!-- ── Live Terminal Log ─────────────────────────────────────────── -->
-        <div class="mb-8">
-            <p class="font-mono text-[10px] uppercase text-ink-400 mb-2 tracking-widest">Agent Thought Stream</p>
+        <div class="mb-6 sm:mb-8">
+            <p class="font-mono text-[10px] uppercase text-ink-400 mb-2 tracking-widest">
+                Aliran Pemikiran Agen / Agent Thought Stream
+            </p>
             <div id="terminal-log" 
-                 class="bg-ink-900 rounded-sm p-4 h-40 overflow-y-auto font-mono text-[11px] leading-relaxed text-ink-300 custom-scrollbar"
+                 class="bg-ink-900 rounded-sm p-3 sm:p-4 h-36 sm:h-44 overflow-y-auto font-mono text-[10px] sm:text-[11px] leading-relaxed text-ink-300 custom-scrollbar"
                  _="on load scroll to bottom">
                 {% if logs %}
                     {% for log in logs %}
                     <div class="flex gap-2 mb-1 animate-[fadeIn_0.3s_ease]">
-                        <span class="text-ink-500 cursor-default select-none">›</span>
-                        <span class="{% if forloop.last %}text-white font-bold{% endif %}">{{ log }}</span>
+                        <span class="text-emerald-500 cursor-default select-none flex-shrink-0">›</span>
+                        <span class="{% if forloop.last %}text-white font-bold{% endif %} break-words">{{ log }}</span>
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="text-ink-500 italic">Waiting for agent broadcast...</div>
+                    <div class="text-ink-500 italic">Menunggu siaran agen... / Waiting for agent broadcast...</div>
                 {% endif %}
-                <div class="w-2 h-4 bg-ink-400 inline-block animate-[blink_1s_step-end_infinite] ml-1"></div>
-            </div>
-        </div>
-
-
-        <!-- ── Agent Status Grid ─────────────────────────────────────────── -->
-        <div class="grid grid-cols-3 gap-4 border-t border-ink-100 pt-6">
-            <div class="text-center">
-                <p class="font-mono text-[9px] uppercase text-ink-400 mb-1">Researcher</p>
-                <div class="w-1.5 h-1.5 mx-auto rounded-full {% if progress > 20 %}bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]{% else %}bg-ink-200 animate-pulse{% endif %}"></div>
-            </div>
-            <div class="text-center">
-                <p class="font-mono text-[9px] uppercase text-ink-400 mb-1">Writer</p>
-                <div class="w-1.5 h-1.5 mx-auto rounded-full {% if progress > 60 %}bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]{% else %}bg-ink-200 {% if progress > 20 %}animate-pulse{% endif %}{% endif %}"></div>
-            </div>
-            <div class="text-center">
-                <p class="font-mono text-[9px] uppercase text-ink-400 mb-1">Editor</p>
-                <div class="w-1.5 h-1.5 mx-auto rounded-full {% if progress > 88 %}bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]{% else %}bg-ink-200 {% if progress > 60 %}animate-pulse{% endif %}{% endif %}"></div>
+                <div class="w-2 h-4 bg-emerald-400 inline-block animate-[blink_1s_step-end_infinite] ml-1"></div>
             </div>
         </div>
 
         <!-- ── Terminate Action ──────────────────────────────────────────── -->
-        <div class="mt-6 text-center">
+        <div class="text-center border-t border-ink-100 pt-4 sm:pt-6">
             <button type="button" 
                     hx-post="{% url 'ai_crew:cancel_task' task_id %}" 
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-confirm="Are you sure you want to completely cancel this generation process? The task will be instantly killed."
-                    class="px-4 py-2 border border-ink-300 text-ink-500 hover:border-red-500 hover:text-red-500 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">
-                Terminate Pipeline
+                    hx-confirm="Anda yakin ingin membatalkan proses generasi ini? Tugas akan langsung dihentikan. / Are you sure you want to cancel this generation?"
+                    class="px-4 py-2 border border-ink-300 text-ink-500 hover:border-red-500 hover:text-red-600 hover:bg-red-50 text-[10px] font-mono font-bold uppercase tracking-widest transition-all duration-300">
+                ✕ Hentikan Pipeline / Terminate
             </button>
         </div>
     </div>
@@ -98,8 +152,11 @@
     <style>
         @keyframes scan { from { transform: translateX(-100%); } to { transform: translateX(500%); } }
         @keyframes blink { 50% { opacity: 0; } }
+        @keyframes shimmer { 0% { transform: translateX(-200%); } 100% { transform: translateX(200%); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4b5563; }
     </style>
 </div>

@@ -1,26 +1,26 @@
 <div id="status-panel" 
-     class="mt-10 border-2 border-ink-950 bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 overflow-hidden"
+     class="mt-8 sm:mt-10 border-2 border-ink-950 bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-5 sm:p-8 overflow-hidden"
      _="on load transition my opacity from 0 to 1 over 500ms then transition my transform from 'translateY(20px)' to 'translateY(0)' over 400ms">
     
     <!-- ── Header ────────────────────────────────────────────────────────── -->
-    <div class="flex items-center justify-between mb-8 border-b-2 border-ink-950 pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 sm:mb-8 border-b-2 border-ink-950 pb-4 gap-2">
         <div class="flex items-center gap-3">
-            <div class="w-5 h-5 bg-ink-950 flex items-center justify-center text-white text-[10px]">✓</div>
-            <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-900 font-black">Generation Successful</p>
+            <div class="w-5 h-5 bg-ink-950 flex items-center justify-center text-white text-[10px] flex-shrink-0">✓</div>
+            <p class="font-mono text-[10px] sm:text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase text-ink-900 font-black">Generasi Berhasil / Generation Successful</p>
         </div>
-        <p class="font-mono text-[10px] text-ink-400 uppercase tracking-widest">Saved as Draft</p>
+        <p class="font-mono text-[10px] text-ink-400 uppercase tracking-widest">Tersimpan Sebagai Draf / Saved as Draft</p>
     </div>
 
     <!-- ── Success Feedback Header ─────────────────────────────────────── -->
-    <div class="mb-8">
-        <h2 class="font-display text-2xl font-black text-ink-950 mb-3 leading-tight">{{ task.post_title }}</h2>
-        <div class="flex items-center gap-4">
+    <div class="mb-6 sm:mb-8">
+        <h2 class="font-display text-xl sm:text-2xl font-black text-ink-950 mb-3 leading-tight">{{ task.post_title }}</h2>
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
             <div class="flex items-center gap-1.5 bg-ink-100 px-2 py-1">
-                <span class="font-mono text-[10px] uppercase text-ink-500">Reading Time:</span>
+                <span class="font-mono text-[10px] uppercase text-ink-500">Waktu Baca:</span>
                 <span class="font-mono text-[10px] font-bold text-ink-900">{{ task.reading_time|default:"5" }} min</span>
             </div>
             {% if task.tags %}
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 {% for tag in task.tags|slice:":3" %}
                 <span class="font-mono text-[10px] text-ink-400">#{{ tag }}</span>
                 {% endfor %}
@@ -30,57 +30,48 @@
     </div>
 
     <!-- ── Promotion Dashboard (Tabs) ──────────────────────────────────── -->
-    <div class="border border-ink-200 mb-8" id="promo-dashboard">
+    <div class="border border-ink-200 mb-6 sm:mb-8" id="promo-dashboard">
         <!-- Tab Headers -->
-        <div class="flex border-b border-ink-200 bg-ink-50 font-mono text-[10px] tracking-widest uppercase">
-            <button class="px-6 py-3 bg-white border-r border-ink-200 text-ink-900 font-bold active-tab"
+        <div class="flex overflow-x-auto border-b border-ink-200 bg-ink-50 font-mono text-[10px] tracking-widest uppercase -mx-px">
+            <button class="px-4 sm:px-6 py-3 bg-white border-r border-ink-200 text-ink-900 font-bold active-tab tab-btn whitespace-nowrap flex-shrink-0"
                     id="tab-summary"
                     _="on click 
                        remove .active-tab from .tab-btn 
                        add .active-tab to me
                        hide .tab-content
-                       show #content-summary
-                       set .tab-btn.bg-white to .bg-ink-50
-                       remove .bg-ink-50 from me
-                       add .bg-white to me">
-                Summary
+                       show #content-summary">
+                Ringkasan / Summary
             </button>
-            <button class="px-6 py-3 border-r border-ink-200 text-ink-400 hover:text-ink-900 transition-colors tab-btn"
+            <button class="px-4 sm:px-6 py-3 border-r border-ink-200 text-ink-400 hover:text-ink-900 transition-colors tab-btn whitespace-nowrap flex-shrink-0"
                     id="tab-social"
                     _="on click 
                        remove .active-tab from .tab-btn 
                        add .active-tab to me
                        hide .tab-content
-                       show #content-social
-                       set .tab-btn.bg-white to .bg-ink-50
-                       remove .bg-ink-50 from me
-                       add .bg-white to me">
-                Social Drafts
+                       show #content-social">
+                Draft Sosial / Social
             </button>
-            <button class="px-6 py-3 text-ink-400 hover:text-ink-900 transition-colors tab-btn"
+            <button class="px-4 sm:px-6 py-3 text-ink-400 hover:text-ink-900 transition-colors tab-btn whitespace-nowrap flex-shrink-0"
                     id="tab-newsletter"
                     _="on click 
                        remove .active-tab from .tab-btn 
                        add .active-tab to me
                        hide .tab-content
-                       show #content-newsletter
-                       set .tab-btn.bg-white to .bg-ink-50
-                       remove .bg-ink-50 from me
-                       add .bg-white to me">
+                       show #content-newsletter">
                 Newsletter
             </button>
         </div>
 
         <!-- Tab Contents -->
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
             <!-- Summary Tab -->
             <div id="content-summary" class="tab-content">
                 <p class="font-body text-sm text-ink-600 leading-relaxed italic mb-4">
                     "{{ task.excerpt|truncatechars:280 }}"
                 </p>
-                <div class="flex items-center gap-4">
-                    <a href="{{ task.post_admin_url }}" class="bg-ink-950 text-white px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-ink-700 transition-all">Edit Draft →</a>
-                    <a href="{{ task.post_public_url }}" class="border border-ink-300 px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:border-ink-950 transition-all">Preview →</a>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+                    <a href="{{ task.post_admin_url }}" class="bg-ink-950 text-white px-4 py-2.5 sm:py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-ink-700 transition-all text-center">Edit Draf / Edit Draft →</a>
+                    <a href="{{ task.post_public_url }}" class="border border-ink-300 px-4 py-2.5 sm:py-2 font-mono text-[10px] uppercase tracking-widest hover:border-ink-950 transition-all text-center">Pratinjau / Preview →</a>
                 </div>
             </div>
 
@@ -89,8 +80,8 @@
                 <div class="space-y-6">
                     {% if task.social_twitter %}
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">Twitter Thread Draft</p>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                            <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">Draft Thread Twitter / X</p>
                             <div class="flex gap-2">
                                 <button class="font-mono text-[9px] text-ink-500 hover:text-ink-900 border border-transparent hover:border-ink-200 px-2 py-0.5 transition-all"
                                         _="on click 
@@ -98,19 +89,19 @@
                                            set link to '{{ task.post_absolute_url }}'
                                            writeText(text + '\n\n' + link) on navigator.clipboard
                                            add .bg-ink-900 to me then add .text-white to me
-                                           put 'COPIED ✓' into me then wait 2s 
+                                           put 'TERSALIN ✓' into me then wait 2s 
                                            remove .bg-ink-900 from me then remove .text-white from me
-                                           put 'Copy All' into me">
-                                    Copy All
+                                           put 'Salin Semua' into me">
+                                    Salin Semua
                                 </button>
                                 <a href="https://twitter.com/intent/tweet?text={{ task.social_twitter.0|urlencode }}%0A%0A{{ task.post_absolute_url|urlencode }}"
                                    target="_blank"
                                    class="font-mono text-[9px] text-white bg-ink-950 px-2 py-0.5 hover:bg-ink-700 transition-all">
-                                    Post to X
+                                    Post ke X
                                 </a>
                             </div>
                         </div>
-                        <div id="twitter-text" class="bg-ink-50 border border-ink-100 p-4 font-body text-xs text-ink-800 space-y-3">
+                        <div id="twitter-text" class="bg-ink-50 border border-ink-100 p-3 sm:p-4 font-body text-xs text-ink-800 space-y-3">
                             {% for tweet in task.social_twitter %}
                             <p>{{ forloop.counter }}/ {{ tweet }}</p>
                             {% endfor %}
@@ -119,8 +110,8 @@
                     {% endif %}
                     {% if task.social_linkedin %}
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">LinkedIn Post Draft</p>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                            <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">Draft Post LinkedIn</p>
                             <div class="flex gap-2">
                                 <button class="font-mono text-[9px] text-ink-500 hover:text-ink-900 border border-transparent hover:border-ink-200 px-2 py-0.5 transition-all"
                                         _="on click 
@@ -128,10 +119,10 @@
                                            set link to '{{ task.post_absolute_url }}'
                                            writeText(text + '\n\n' + link) on navigator.clipboard
                                            add .bg-ink-900 to me then add .text-white to me
-                                           put 'COPIED ✓' into me then wait 2s 
+                                           put 'TERSALIN ✓' into me then wait 2s 
                                            remove .bg-ink-900 from me then remove .text-white from me
-                                           put 'Copy Text' into me">
-                                    Copy Text
+                                           put 'Salin Teks' into me">
+                                    Salin Teks
                                 </button>
                                 <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ task.post_absolute_url|urlencode }}"
                                    target="_blank"
@@ -140,7 +131,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div id="linkedin-text" class="bg-ink-50 border border-ink-100 p-4 font-body text-xs text-ink-800 leading-relaxed">
+                        <div id="linkedin-text" class="bg-ink-50 border border-ink-100 p-3 sm:p-4 font-body text-xs text-ink-800 leading-relaxed">
                             {{ task.social_linkedin }}
                         </div>
                     </div>
@@ -150,42 +141,43 @@
 
             <!-- Newsletter Tab -->
             <div id="content-newsletter" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-2">
-                    <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">Newsletter Segment</p>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+                    <p class="font-mono text-[9px] text-ink-400 uppercase tracking-tighter">Segmen Newsletter</p>
                             <button class="font-mono text-[9px] text-ink-500 hover:text-ink-900 border border-transparent hover:border-ink-200 px-2 py-0.5 transition-all"
                                     id="btn-newsletter"
                                     _="on click 
                                        set text to #newsletter-text.innerText
                                        set link to '{{ task.post_absolute_url }}'
-                                       writeText(text + '\n\nRead more: ' + link) on navigator.clipboard
+                                       writeText(text + '\n\nBaca selengkapnya: ' + link) on navigator.clipboard
                                        add .bg-ink-900 to me then add .text-white to me
-                                       put 'COPIED TO CLIPBOARD ✓' into me 
+                                       put 'TERSALIN ✓' into me 
                                        wait 2s 
                                        remove .bg-ink-900 from me then remove .text-white from me
-                                       put 'Copy' into me">
-                                Copy
+                                       put 'Salin' into me">
+                                Salin
                             </button>
                 </div>
-                <div id="newsletter-text" class="bg-ink-950 text-ink-100 p-6 font-body text-xs leading-loose selection:bg-white selection:text-black">
-                    {{ task.newsletter_copy|default:"Distribute this post to your subscribers using the snippet above." }}
+                <div id="newsletter-text" class="bg-ink-950 text-ink-100 p-4 sm:p-6 font-body text-xs leading-loose selection:bg-white selection:text-black">
+                    {{ task.newsletter_copy|default:"Distribusikan post ini ke subscriber menggunakan cuplikan di atas. / Distribute this post to your subscribers." }}
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ── Footer Actions ──────────────────────────────────────────────── -->
-    <div class="flex items-center justify-between border-t border-ink-100 pt-6">
+    <div class="flex flex-col sm:flex-row items-center justify-between border-t border-ink-100 pt-4 sm:pt-6 gap-3">
         <button _="on click reload() the location"
-                class="font-mono text-[11px] tracking-widest uppercase text-ink-400 hover:text-ink-950 transition-colors flex items-center gap-2">
-            <span>+</span> Generate Another Post
+                class="font-mono text-[11px] tracking-widest uppercase text-ink-400 hover:text-ink-950 transition-colors flex items-center gap-2 order-2 sm:order-1">
+            <span>+</span> Buat Post Lagi / Generate Another
         </button>
-        <span class="font-mono text-[9px] text-ink-200 uppercase tracking-[0.4em]">Stigma.Distribution_v2</span>
+        <span class="font-mono text-[9px] text-ink-200 uppercase tracking-[0.4em] order-1 sm:order-2">Stigma.Distribution_v2.1</span>
     </div>
 
     <style>
         .active-tab {
             border-bottom: 2px solid #000 !important;
             background: #fff !important;
+            color: #080808 !important;
         }
     </style>
 </div>

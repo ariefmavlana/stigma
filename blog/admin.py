@@ -88,9 +88,9 @@ class PostAdmin(MarkdownxModelAdmin):
     def ai_badge(self, obj):
         if obj.is_ai_generated:
             return format_html(
-                '<span style="color:#6b7280; font-family:monospace; font-size:0.7rem;">✦ AI</span>'
+                '<span style="color:#6b7280; font-family:monospace; font-size:0.7rem;">{}</span>', '✦ AI'
             )
-        return format_html('<span style="color:#d1d5db; font-size:0.75rem;">—</span>')
+        return format_html('<span style="color:#d1d5db; font-size:0.75rem;">{}</span>', '—')
     ai_badge.short_description = "AI"
     ai_badge.admin_order_field = "is_ai_generated"
 
@@ -126,10 +126,10 @@ class CommentAdmin(admin.ModelAdmin):
     def approved_badge(self, obj):
         if obj.is_approved:
             return format_html(
-                '<span style="font-family:monospace; font-size:0.7rem; color:#166534;">✓ Approved</span>'
+                '<span style="font-family:monospace; font-size:0.7rem; color:#166534;">{}</span>', '✓ Approved'
             )
         return format_html(
-            '<span style="font-family:monospace; font-size:0.7rem; color:#92400e;">Pending</span>'
+            '<span style="font-family:monospace; font-size:0.7rem; color:#92400e;">{}</span>', 'Pending'
         )
     approved_badge.short_description = "Status"
     approved_badge.admin_order_field = "is_approved"
