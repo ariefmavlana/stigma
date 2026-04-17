@@ -1,610 +1,285 @@
-/*
- * STIgma — Django Admin Monochrome Theme
- * ────────────────────────────────────────
- * A clean, editorial, black-and-white admin skin.
- * Loaded via templates/admin/base_site.html → {% block extrahead %}.
- */
+/* 
+   STIgma Admin Monochrome Bridge — NYT CMS Style
+   ─────────────────────────────────────────────
+   A complete overhaul of the default Django Admin to provide an 
+   editorial, newspaper-like authoring environment.
+*/
 
-/* ── Typography ────────────────────────────────────────────────────────── */
 :root {
-  --admin-font: 'IBM Plex Mono', 'Menlo', 'Consolas', monospace;
-  --admin-body-font: 'IBM Plex Serif', Georgia, serif;
-  --black: #080808;
-  --ink-900: #0d0d0d;
-  --ink-800: #1a1a1a;
-  --ink-700: #2e2e2e;
-  --ink-600: #4a4a4a;
-  --ink-500: #6b6b6b;
-  --ink-400: #a0a0a0;
-  --ink-300: #d0d0d0;
-  --ink-200: #e8e8e8;
-  --ink-100: #f4f4f4;
-  --ink-50: #fafafa;
+    --primary: #000000;
+    --primary-fg: #ffffff;
+    --header-bg: #ffffff;
+    --header-color: #000000;
+    --breadcrumbs-bg: #ffffff;
+    --link-fg: #000000;
+    --link-hover-color: #666666;
+    
+    --ink-50:  #fafafa;
+    --ink-100: #f4f4f4;
+    --ink-200: #e8e8e8;
+    --ink-900: #0d0d0d;
+    --ink-950: #080808;
+    
+    /* Typographic Overrides */
+    --font-family-primary: 'IBM Plex Serif', Georgia, serif;
+    --font-family-monospace: 'IBM Plex Mono', Menlo, monospace;
 }
 
-body,
-#content,
-.colMS,
-.colSM {
-  font-family: var(--admin-body-font) !important;
-  background: var(--ink-50) !important;
-  color: var(--ink-800) !important;
+/* ── Base & Body ───────────────────────────────────────────────────────── */
+body {
+    background-color: var(--ink-50) !important;
+    color: var(--primary) !important;
+    font-family: var(--font-family-primary) !important;
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
+#container {
+    background: transparent !important;
+}
+
+/* ── Header Layer ──────────────────────────────────────────────────────── */
 #header {
-  background: var(--black) !important;
-  border-bottom: none !important;
-  padding: 12px 24px !important;
-  box-shadow: none !important;
+    background: var(--header-bg) !important;
+    color: var(--header-color) !important;
+    padding: 1.5rem 2rem !important;
+    border-bottom: 4px solid var(--ink-950);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-#header a:link,
-#header a:visited {
-  color: var(--ink-100) !important;
+#header a:link, #header a:visited {
+    color: var(--header-color) !important;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.15em;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
-#branding h1,
-#branding h1 a:link,
-#branding h1 a:visited {
-  font-family: var(--admin-font) !important;
-  font-size: 1rem !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.15em !important;
-  text-transform: uppercase !important;
-  color: #fff !important;
+#site-name a {
+    font-family: 'Playfair Display', serif !important;
+    font-size: 1.5rem !important;
+    letter-spacing: -0.02em !important;
+    text-transform: none !important;
+    font-weight: 900 !important;
 }
 
-#user-tools {
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.08em !important;
-  color: var(--ink-400) !important;
-}
-
-#user-tools a {
-  color: var(--ink-300) !important;
-  text-decoration: none !important;
-  border-bottom: 1px solid transparent !important;
-  transition: color 0.15s, border-color 0.15s !important;
-}
-
-#user-tools a:hover {
-  color: #fff !important;
-  border-bottom-color: var(--ink-400) !important;
-}
-
-/* ── Breadcrumbs ────────────────────────────────────────────────────────── */
+/* ── Breadcrumbs ───────────────────────────────────────────────────────── */
 div.breadcrumbs {
-  background: var(--ink-100) !important;
-  border-bottom: 1px solid var(--ink-200) !important;
-  padding: 8px 24px !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.06em !important;
-  color: var(--ink-500) !important;
+    background: var(--breadcrumbs-bg) !important;
+    border-bottom: 1px solid var(--ink-200);
+    color: var(--ink-900) !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 1rem 2.5rem !important;
 }
-
 div.breadcrumbs a {
-  color: var(--ink-600) !important;
-  text-decoration: none !important;
+    color: var(--ink-500) !important;
+    text-decoration: none !important;
 }
-
 div.breadcrumbs a:hover {
-  color: var(--ink-900) !important;
+    color: var(--ink-950) !important;
 }
 
-/* ── Content area ───────────────────────────────────────────────────────── */
-#content {
-  padding: 24px !important;
-}
-
+/* ── Typography & Headings ──────────────────────────────────────────────── */
 #content h1 {
-  font-family: var(--admin-font) !important;
-  font-size: 1.1rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
-  color: var(--ink-900) !important;
-  text-transform: uppercase !important;
-  border-bottom: 2px solid var(--ink-900) !important;
-  padding-bottom: 8px !important;
-  margin-bottom: 20px !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: 2.5rem !important;
+    font-weight: 900 !important;
+    color: var(--ink-950) !important;
+    border-bottom: none !important;
+    margin-bottom: 2rem !important;
 }
 
-/* ── Modules / Panels ───────────────────────────────────────────────────── */
-.module {
-  background: #fff !important;
-  border: 1px solid var(--ink-200) !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  margin-bottom: 16px !important;
+.module h2, .module caption, .inline-group h2 {
+    background: #ffffff !important;
+    color: var(--ink-950) !important;
+    text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem !important;
+    border-top: 2px solid var(--ink-950) !important;
+    border-bottom: 1px solid var(--ink-200) !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 600 !important;
 }
 
-.module h2,
-.module caption,
-.inline-group h2 {
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.18em !important;
-  text-transform: uppercase !important;
-  color: #fff !important;
-  background: var(--ink-900) !important;
-  padding: 8px 12px !important;
-  border-radius: 0 !important;
+/* ── Links ──────────────────────────────────────────────────────────────── */
+a:link, a:visited {
+    color: #000 !important;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+a:hover {
+    color: #666 !important;
 }
 
-/* ── Sidebar (filters & recent actions) ─────────────────────────────────── */
-#sidebar {
-  padding-right: 0 !important;
+/* ── Buttons & Submit Rows ──────────────────────────────────────────────── */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--ink-950) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    letter-spacing: 0.1em !important;
+    padding: 0.75rem 1.5rem !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
 }
 
-#changelist-filter {
-  border: 1px solid var(--ink-200) !important;
-  background: #fff !important;
+.button:hover, input[type=submit]:hover {
+    background: #333 !important;
+    color: #fff !important;
 }
 
-#changelist-filter h2 {
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.18em !important;
-  text-transform: uppercase !important;
-  background: var(--ink-900) !important;
-  color: #fff !important;
-  padding: 8px 12px !important;
+.button.default, input[type=submit].default {
+    background: #000 !important;
+    border: 2px solid #000 !important;
 }
 
-#changelist-filter h3 {
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  color: var(--ink-500) !important;
-  margin: 12px 12px 4px !important;
-  border-bottom: 1px solid var(--ink-200) !important;
-  padding-bottom: 4px !important;
+.button:active, input[type=submit]:active {
+    transform: translateY(1px);
 }
 
-#changelist-filter li {
-  padding: 2px 12px !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.75rem !important;
-}
-
-#changelist-filter li a {
-  color: var(--ink-600) !important;
-  text-decoration: none !important;
-}
-
-#changelist-filter li a:hover,
-#changelist-filter li.selected a {
-  color: var(--ink-900) !important;
-}
-
-/* ── Tables ─────────────────────────────────────────────────────────────── */
-#result_list {
-  border: 1px solid var(--ink-200) !important;
-}
-
-#result_list thead th {
-  background: var(--ink-100) !important;
-  border-bottom: 2px solid var(--ink-300) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: var(--ink-600) !important;
-  padding: 8px 12px !important;
-}
-
-#result_list thead th a {
-  color: var(--ink-600) !important;
-  text-decoration: none !important;
-}
-
-#result_list thead th a:hover {
-  color: var(--ink-900) !important;
-}
-
-#result_list thead th.sorted {
-  background: var(--ink-200) !important;
-  color: var(--ink-900) !important;
-}
-
-#result_list tbody tr {
-  border-bottom: 1px solid var(--ink-100) !important;
-  transition: background 0.1s !important;
-}
-
-#result_list tbody tr:hover {
-  background: var(--ink-50) !important;
-}
-
-#result_list td {
-  padding: 10px 12px !important;
-  font-family: var(--admin-body-font) !important;
-  font-size: 0.85rem !important;
-  color: var(--ink-700) !important;
-  border-bottom: none !important;
-}
-
-#result_list td a {
-  color: var(--ink-900) !important;
-  text-decoration: none !important;
-  font-weight: 500 !important;
-}
-
-#result_list td a:hover {
-  text-decoration: underline !important;
-}
-
-/* Checkbox column */
-#result_list td.action-checkbox,
-#result_list th.action-checkbox-column {
-  width: 24px !important;
-}
-
-/* ── Pagination ─────────────────────────────────────────────────────────── */
-.paginator {
-  font-family: var(--admin-font) !important;
-  font-size: 0.75rem !important;
-  color: var(--ink-500) !important;
-  padding: 12px !important;
-  background: var(--ink-50) !important;
-  border-top: 1px solid var(--ink-200) !important;
-}
-
-.paginator a {
-  color: var(--ink-700) !important;
-  padding: 4px 8px !important;
-  border: 1px solid var(--ink-300) !important;
-  text-decoration: none !important;
-}
-
-.paginator a:hover {
-  border-color: var(--ink-900) !important;
-}
-
-.paginator .this-page {
-  background: var(--ink-900) !important;
-  color: #fff !important;
-  padding: 4px 8px !important;
-  border: 1px solid var(--ink-900) !important;
-}
-
-/* ── Forms & Inputs ─────────────────────────────────────────────────────── */
-.form-row {
-  border-bottom: 1px solid var(--ink-100) !important;
-  padding: 10px 12px !important;
-}
-
-.form-row label {
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
-  color: var(--ink-500) !important;
-  font-weight: 500 !important;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="url"],
-input[type="number"],
-input[type="search"],
-textarea,
-select {
-  border: 1px solid var(--ink-300) !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  font-family: var(--admin-body-font) !important;
-  font-size: 0.875rem !important;
-  color: var(--ink-800) !important;
-  background: #fff !important;
-  padding: 6px 10px !important;
-  transition: border-color 0.15s !important;
-  outline: none !important;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--ink-900) !important;
-  box-shadow: none !important;
-}
-
-/* ── Buttons ─────────────────────────────────────────────────────────────── */
-.button,
-input[type="submit"],
-input[type="button"],
-.submit-row input,
-.submit-row button,
-a.button {
-  background: var(--ink-900) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 0 !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  padding: 8px 16px !important;
-  cursor: pointer !important;
-  transition: background 0.15s !important;
-  text-decoration: none !important;
-}
-
-.button:hover,
-input[type="submit"]:hover,
-.submit-row input[type="submit"]:hover,
-a.button:hover {
-  background: var(--ink-700) !important;
-}
-
-.button.default,
-input[type="submit"].default,
-.submit-row input.default {
-  background: var(--black) !important;
-}
-
-/* Danger / delete button */
-.deletelink,
-.submit-row a.deletelink {
-  background: transparent !important;
-  color: var(--ink-500) !important;
-  border: 1px solid var(--ink-300) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  text-decoration: none !important;
-  padding: 7px 14px !important;
-}
-
-.deletelink:hover {
-  color: #b91c1c !important;
-  border-color: #b91c1c !important;
-  background: transparent !important;
-}
-
-/* ── Submit row ─────────────────────────────────────────────────────────── */
+/* Sticky Submit Row */
 .submit-row {
-  background: var(--ink-100) !important;
-  border: 1px solid var(--ink-200) !important;
-  border-top: 2px solid var(--ink-300) !important;
-  border-radius: 0 !important;
-  padding: 10px 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100 !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-top: 2px solid var(--ink-950) !important;
+    padding: 1.5rem 2rem !important;
+    margin: 2rem -2rem -2rem -2rem !important;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05) !important;
+}
+.submit-row .deletelink {
+    background: transparent !important;
+    color: #cc0000 !important;
+    border: 1px solid #cc0000 !important;
+    margin-right: auto;
 }
 
-/* ── Dashboard — app index ──────────────────────────────────────────────── */
-#content-main .app-blog,
-#content-main .app-ai-crew,
-#content-main .app-auth,
-#content-main .app-taggit {
-  border: 1px solid var(--ink-200) !important;
-  border-radius: 0 !important;
-  overflow: hidden !important;
+/* ── Form Inputs ────────────────────────────────────────────────────────── */
+input[type=text], input[type=password], input[type=email], input[type=url], 
+input[type=number], input[type=tel], textarea, select {
+    border: none !important;
+    border-bottom: 1px solid var(--ink-400) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 0.5rem 0 !important;
+    font-family: 'IBM Plex Serif', serif !important;
+    font-size: 1.05rem !important;
+    color: var(--ink-950) !important;
+    transition: all 0.2s ease !important;
 }
 
-.app-blog td,
-.app-auth td,
-.app-taggit td {
-  border-bottom: 1px solid var(--ink-100) !important;
+input[type=text]:focus, textarea:focus, select:focus {
+    border-bottom: 2px solid var(--ink-950) !important;
+    outline: none !important;
+    background: rgba(0,0,0,0.02) !important;
 }
 
-/* Dashboard quick links */
-#content-main table.model-list td a {
-  color: var(--ink-700) !important;
-  text-decoration: none !important;
-  font-family: var(--admin-body-font) !important;
+.vTextField, .vURLField { width: 100% !important; max-width: 600px !important; }
+.vLargeTextField { width: 100% !important; max-width: 800px !important; }
+
+fieldset.module {
+    background: #ffffff !important;
+    border: 1px solid var(--ink-200) !important;
+    box-shadow: none !important;
 }
 
-#content-main table.model-list td a:hover {
-  color: var(--ink-900) !important;
+.form-row {
+    border-bottom: 1px solid var(--ink-100) !important;
+    padding: 1.5rem 1rem !important;
 }
 
-/* ── Recent actions sidebar ─────────────────────────────────────────────── */
-#recent-actions-module .actionlist {
-  padding: 0 !important;
+div.fieldBox label {
+    font-family: 'IBM Plex Mono', monospace !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    font-size: 0.75rem !important;
+    color: var(--ink-600) !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 0.5rem !important;
 }
 
-#recent-actions-module .actionlist li {
-  padding: 8px 12px !important;
-  border-bottom: 1px solid var(--ink-100) !important;
-  font-size: 0.8rem !important;
+/* ── Tables & Changelists ───────────────────────────────────────────────── */
+#changelist table {
+    border: 1px solid var(--ink-200) !important;
 }
 
-#recent-actions-module .actionlist li:last-child {
-  border-bottom: none !important;
+#changelist table thead th {
+    background: var(--ink-50) !important;
+    color: var(--ink-900) !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-size: 0.75rem !important;
+    padding: 1rem !important;
+    border-bottom: 2px solid var(--ink-900) !important;
 }
 
-#recent-actions-module .actionlist .addlink::before {
-  content: '+ ';
-  color: var(--ink-400);
+#changelist table tbody td, #changelist table tbody th {
+    padding: 1rem !important;
+    font-family: 'IBM Plex Serif', serif !important;
+    border-bottom: 1px solid var(--ink-100) !important;
 }
 
-#recent-actions-module .actionlist .changelink::before {
-  content: '✎ ';
-  color: var(--ink-400);
+#changelist table tbody tr {
+    background: #ffffff !important;
+}
+#changelist table tbody tr:nth-child(even) {
+    background: var(--ink-50) !important;
+}
+#changelist table tbody tr:hover {
+    background: var(--ink-100) !important;
 }
 
-#recent-actions-module .actionlist .deletelink::before {
-  content: '− ';
-  color: var(--ink-400);
-}
-
-/* ── Messages / alerts ──────────────────────────────────────────────────── */
-.messagelist {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.messagelist li {
-  border: none !important;
-  border-left: 3px solid var(--ink-900) !important;
-  background: var(--ink-100) !important;
-  color: var(--ink-800) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.8rem !important;
-  padding: 10px 16px !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-}
-
-.messagelist li.success {
-  border-left-color: #166534 !important;
-  background: #f0fdf4 !important;
-  color: #14532d !important;
-}
-
-.messagelist li.error {
-  border-left-color: #991b1b !important;
-  background: #fef2f2 !important;
-  color: #7f1d1d !important;
-}
-
-.messagelist li.warning {
-  border-left-color: #92400e !important;
-  background: #fffbeb !important;
-  color: #78350f !important;
-}
-
-/* ── Search box ─────────────────────────────────────────────────────────── */
 #changelist-search {
-  padding: 12px !important;
-  background: var(--ink-50) !important;
-  border-bottom: 1px solid var(--ink-200) !important;
+    margin-bottom: 1.5rem !important;
+}
+#searchbar {
+    width: 300px !important;
+    padding: 0.5rem !important;
+    font-family: 'IBM Plex Serif', serif !important;
+    font-size: 1rem !important;
 }
 
-#changelist-search input[type="text"] {
-  width: 260px !important;
+/* ── Custom "AI" indicators in list view ────────────────────────────────── */
+.field-ai_badge {
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    padding: 0.2rem 0.5rem !important;
+    border: 1px solid #000 !important;
+    text-transform: uppercase !important;
 }
 
-#changelist-search input[type="submit"] {
-  padding: 6px 12px !important;
+/* Markdown Editor Polish */
+.markdownx-preview {
+    background: #ffffff !important;
+    border: 1px solid var(--ink-200) !important;
+    padding: 2rem !important;
+    font-family: 'IBM Plex Serif', serif !important;
+    line-height: 1.8 !important;
 }
 
-/* ── Action bar ─────────────────────────────────────────────────────────── */
-.actions {
-  background: var(--ink-50) !important;
-  border-bottom: 1px solid var(--ink-200) !important;
-  padding: 8px 12px !important;
-}
-
-.actions label {
-  font-family: var(--admin-font) !important;
-  font-size: 0.75rem !important;
-  color: var(--ink-600) !important;
-}
-
-.actions select {
-  width: auto !important;
-  font-size: 0.8rem !important;
-}
-
-/* ── Date hierarchy ─────────────────────────────────────────────────────── */
-.xfull {
-  font-family: var(--admin-font) !important;
-  font-size: 0.75rem !important;
-}
-
-/* ── Object tools (top-right buttons on detail page) ────────────────────── */
-.object-tools {
-  margin-bottom: 0 !important;
-}
-
-.object-tools a {
-  background: transparent !important;
-  border: 1px solid var(--ink-300) !important;
-  color: var(--ink-700) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  padding: 6px 12px !important;
-  border-radius: 0 !important;
-  transition: border-color 0.15s, color 0.15s !important;
-}
-
-.object-tools a:hover,
-.object-tools a.addlink:hover {
-  border-color: var(--ink-900) !important;
-  color: var(--ink-900) !important;
-  background: transparent !important;
-}
-
-/* ── Fieldsets ──────────────────────────────────────────────────────────── */
-fieldset {
-  border: 1px solid var(--ink-200) !important;
-  margin-bottom: 16px !important;
-  padding: 0 !important;
-}
-
-fieldset h2 {
-  background: var(--ink-100) !important;
-  color: var(--ink-600) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.65rem !important;
-  letter-spacing: 0.15em !important;
-  text-transform: uppercase !important;
-  padding: 6px 12px !important;
-  border-bottom: 1px solid var(--ink-200) !important;
-}
-
-/* ── Collapse fieldsets ─────────────────────────────────────────────────── */
-fieldset.collapsed h2 {
-  background: var(--ink-50) !important;
-}
-
-/* ── Help text ──────────────────────────────────────────────────────────── */
-.help {
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-  color: var(--ink-400) !important;
-}
-
-/* ── Inline admin ───────────────────────────────────────────────────────── */
-.inline-group {
-  border: 1px solid var(--ink-200) !important;
-  margin-bottom: 16px !important;
-}
-
-/* ── Related-widget links ───────────────────────────────────────────────── */
-.related-widget-wrapper-link,
-a.related-lookup,
-a.add-another {
-  color: var(--ink-500) !important;
-  font-family: var(--admin-font) !important;
-  font-size: 0.7rem !important;
-}
-
-/* ── Scrollbar (webkit) ─────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--ink-100);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--ink-300);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ink-500);
-}
-
-/* ── Selection ───────────────────────────────────────────────────────────── */
-::selection {
-  background: var(--ink-900);
-  color: #fff;
+/* ── HTMX Transitions ───────────────────────────────────────────────────── */
+#changelist-form.htmx-request {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 200ms ease;
 }

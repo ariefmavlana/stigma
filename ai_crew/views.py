@@ -10,9 +10,9 @@ import time
 
 from celery.result import AsyncResult
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 
 from blog.models import Post
 from .forms import GeneratePostForm
@@ -52,12 +52,14 @@ def generate_view(request):
             topic=topic,
             target_audience=form.cleaned_data["target_audience"],
             tone=form.cleaned_data["tone"],
+            language=form.cleaned_data.get("language", "Indonesian"),
             category_id=cat_obj.pk if cat_obj else None,
             user_id=request.user.pk,
             start_time=start_time_ms
         )
         
         task_id = task.id
+        request.session['active_ai_task_id'] = task_id
         logger.info("Dispatched celery task [id=%s, topic=%r]", task_id, topic)
         
         if request.headers.get("HX-Request"):
@@ -69,6 +71,15 @@ def generate_view(request):
             
         return JsonResponse({"task_id": task_id, "status": "running"})
 
+    # GET Request: check if active task exists
+    active_task_id = request.session.get('active_ai_task_id')
+    if active_task_id:
+        result = AsyncResult(active_task_id)
+        if result.ready():
+            # If it's already done (success or failed), clear session so we show fresh form
+            request.session.pop('active_ai_task_id', None)
+            active_task_id = None
+
     form = GeneratePostForm()
     return render(
         request,
@@ -77,6 +88,7 @@ def generate_view(request):
             "form": form,
             "title": "AI Post Generator",
             "recent_ai_posts": recent_ai_posts,
+            "active_task_id": active_task_id,
         },
     )
 
@@ -94,6 +106,9 @@ def task_status_view(request, task_id):
     }
 
     if result.ready():
+        if "active_ai_task_id" in request.session:
+            del request.session["active_ai_task_id"]
+
         if result.successful():
             response_data.update(result.result) # Merges the dict returned by task
         else:
@@ -130,3 +145,22 @@ def task_status_view(request, task_id):
             })
 
     return JsonResponse(response_data)
+
+
+@staff_member_required
+@require_POST
+def cancel_task_view(request, task_id):
+    """
+    Aborts a running AI generated task via Celery revoke and clears session tracking.
+    """
+    if 'active_ai_task_id' in request.session:
+        request.session.pop('active_ai_task_id', None)
+        
+    result = AsyncResult(task_id)
+    result.revoke(terminate=True)  # Instantly kill the celerey worker process handling this task
+    
+    logger.info("Revoked celery task [id=%s]", task_id)
+    
+    response = HttpResponse()
+    response["HX-Refresh"] = "true"
+    return response

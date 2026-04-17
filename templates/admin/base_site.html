@@ -15,7 +15,28 @@
 {{ block.super }}
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,500;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&display=swap"
       rel="stylesheet" />
 <link rel="stylesheet" href="{% static 'css/admin-mono.css' %}" />
+<!-- HTMX & Hyperscript for Admin Interactivity -->
+<script src="https://unpkg.com/htmx.org@2.0.8"></script>
+<script src="https://unpkg.com/hyperscript.org@0.9.91"></script>
+
+<script type="text/hyperscript">
+  on load
+    if #searchbar exists 
+      set searchForm to <form#changelist-search/>
+      if searchForm exists
+        get searchForm.getAttribute('action') then set action to it
+        if action == null set action to ""
+        
+        -- Make the form submit via HTMX, targeting just the results table and paginator
+        searchForm.setAttribute('hx-get', action)
+        searchForm.setAttribute('hx-target', '#changelist-form')
+        searchForm.setAttribute('hx-select', '#changelist-form')
+        searchForm.setAttribute('hx-trigger', 'keyup delay:400ms from:#searchbar, search from:#searchbar')
+        
+        -- Tell HTMX to process the newly added attributes
+        htmx.process(searchForm)
+</script>
 {% endblock %}

@@ -25,13 +25,16 @@ class PostAdmin(MarkdownxModelAdmin):
         "title",
         "author",
         "category",
+        "status",
         "status_badge",
         "ai_badge",
         "reading_time_display",
         "views",
         "published_at",
     ]
+
     list_filter      = ["status", "is_ai_generated", "category", "created_at"]
+    list_editable    = ["status", "category"]
     search_fields    = ["title", "body", "excerpt"]
     prepopulated_fields = {"slug": ("title",)}
     date_hierarchy   = "created_at"
@@ -42,25 +45,34 @@ class PostAdmin(MarkdownxModelAdmin):
 
     fieldsets = (
         (
-            "Content",
-            {"fields": ("title", "slug", "excerpt", "body", "cover_image")},
+            "Editorial Content",
+            {
+                "fields": ("title", "slug", "excerpt", "body", "cover_image"),
+                "description": "The core post data. Use Markdown for the body.",
+            },
         ),
         (
-            "Classification",
-            {"fields": ("category", "tags")},
+            "Classification & SEO",
+            {"fields": ("category", "tags", "reading_time")},
         ),
         (
-            "Publication",
+            "Publication Metadata",
             {"fields": ("status", "author", "published_at", "is_ai_generated")},
         ),
         (
-            "Statistics",
+            "System Logs",
             {
-                "fields": ("views", "reading_time", "created_at", "updated_at"),
+                "fields": ("views", "created_at", "updated_at"),
                 "classes": ("collapse",),
             },
         ),
     )
+
+    class Media:
+        css = {
+            "all": ("css/admin-mono.css",)
+        }
+
 
     def status_badge(self, obj):
         styles = {
@@ -131,3 +143,9 @@ class CommentAdmin(admin.ModelAdmin):
     def unapprove_comments(self, request, queryset):
         updated = queryset.update(is_approved=False)
         self.message_user(request, f"{updated} comment(s) unapproved.")
+
+
+# ── Admin Site Customization ────────────────────────────────────────────────
+admin.site.site_header = "STIgma Editorial"
+admin.site.site_title  = "STIgma"
+admin.site.index_title = "Content Management Dashboard"

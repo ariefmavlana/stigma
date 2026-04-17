@@ -53,9 +53,9 @@
                  _="on load scroll to bottom">
                 {% if logs %}
                     {% for log in logs %}
-                    <div class="flex gap-2 mb-1">
-                        <span class="text-ink-500 cursor-default prose-none">›</span>
-                        <span class="{% if forloop.last %}text-white animate-pulse{% endif %}">{{ log }}</span>
+                    <div class="flex gap-2 mb-1 animate-[fadeIn_0.3s_ease]">
+                        <span class="text-ink-500 cursor-default select-none">›</span>
+                        <span class="{% if forloop.last %}text-white font-bold{% endif %}">{{ log }}</span>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -64,6 +64,7 @@
                 <div class="w-2 h-4 bg-ink-400 inline-block animate-[blink_1s_step-end_infinite] ml-1"></div>
             </div>
         </div>
+
 
         <!-- ── Agent Status Grid ─────────────────────────────────────────── -->
         <div class="grid grid-cols-3 gap-4 border-t border-ink-100 pt-6">
@@ -79,6 +80,17 @@
                 <p class="font-mono text-[9px] uppercase text-ink-400 mb-1">Editor</p>
                 <div class="w-1.5 h-1.5 mx-auto rounded-full {% if progress > 88 %}bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]{% else %}bg-ink-200 {% if progress > 60 %}animate-pulse{% endif %}{% endif %}"></div>
             </div>
+        </div>
+
+        <!-- ── Terminate Action ──────────────────────────────────────────── -->
+        <div class="mt-6 text-center">
+            <button type="button" 
+                    hx-post="{% url 'ai_crew:cancel_task' task_id %}" 
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-confirm="Are you sure you want to completely cancel this generation process? The task will be instantly killed."
+                    class="px-4 py-2 border border-ink-300 text-ink-500 hover:border-red-500 hover:text-red-500 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">
+                Terminate Pipeline
+            </button>
         </div>
     </div>
 

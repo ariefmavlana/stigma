@@ -5,142 +5,141 @@
 
 <!-- ── Featured Post ──────────────────────────────────────────────────────── -->
 {% if featured %}
-<section class="border-b border-ink-200">
-  <div class="max-w-6xl mx-auto px-6 py-12 md:py-16">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+<section class="max-w-[1400px] mx-auto px-6 py-8 border-b border-ink-300">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
 
-      <!-- Text side -->
-      <div class="md:col-span-7 md:pr-8">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="font-mono text-xs tracking-[0.2em] uppercase text-ink-400 border border-ink-300 px-2 py-1">
-            Featured
-          </span>
-          {% if featured.category %}
-          <a href="{{ featured.category.get_absolute_url }}"
-             class="font-mono text-xs tracking-[0.2em] uppercase text-ink-500 hover:text-ink-900 transition-colors">
-            {{ featured.category.name }}
-          </a>
-          {% endif %}
-          {% if featured.is_ai_generated %}
-          <span class="ai-badge">✦ AI-Assisted</span>
-          {% endif %}
-        </div>
-
-        <h2 class="font-display text-4xl md:text-5xl font-bold leading-tight text-ink-950 mb-4">
-          <a href="{{ featured.get_absolute_url }}"
-             class="hover:text-ink-600 transition-colors">
-            {{ featured.title }}
-          </a>
-        </h2>
-
-        <p class="font-body text-lg text-ink-600 leading-relaxed mb-6">
-          {{ featured.excerpt|truncatewords:35 }}
-        </p>
-
-        <div class="flex items-center gap-4">
-          <a href="{{ featured.get_absolute_url }}"
-             class="font-mono text-sm tracking-wider uppercase text-ink-950 border-b-2 border-ink-950 pb-0.5 hover:text-ink-600 hover:border-ink-600 transition-colors">
-            Read Essay →
-          </a>
-          <span class="font-mono text-xs text-ink-400">{{ featured.reading_time }} min read</span>
-          <span class="font-mono text-xs text-ink-400">{{ featured.published_at|date:"N j, Y" }}</span>
-        </div>
-      </div>
-
-      <!-- Cover image side -->
-      <div class="md:col-span-5">
-        {% if featured.cover_image %}
-        <div class="aspect-[4/3] overflow-hidden bg-ink-100">
-          <img src="{{ featured.cover_image.url }}" alt="{{ featured.title }}"
-               class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
-        </div>
-        {% else %}
-        <div class="aspect-[4/3] bg-ink-100 flex items-center justify-center">
-          <span class="font-display text-8xl font-black text-ink-200">
-            {{ featured.title|first }}
-          </span>
-        </div>
+    <!-- Text side -->
+    <div class="md:col-span-12 lg:col-span-5 flex flex-col justify-center h-full order-2 lg:order-1 pt-4 lg:pt-0">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="font-mono text-[10px] uppercase font-bold text-white bg-ink-950 px-2 py-0.5 tracking-widest">Top Feature</span>
+        {% if featured.category %}
+        <span class="text-ink-300 ml-2">|</span>
+        <a href="{{ featured.category.get_absolute_url }}" class="font-mono text-xs uppercase font-bold text-ink-600 hover:text-ink-900 transition-colors">
+          {{ featured.category.name }}
+        </a>
+        {% endif %}
+        {% if featured.is_ai_generated %}
+        <span class="ai-badge ml-auto text-ink-950 font-bold border-ink-950">✦ AI</span>
         {% endif %}
       </div>
+
+      <h2 class="font-display text-5xl lg:text-7xl font-black leading-[1.05] tracking-tight text-ink-950 mb-5">
+        <a href="{{ featured.get_absolute_url }}" class="hover:opacity-75 transition-opacity decoration-ink-300 underline-offset-4 hover:underline">
+          {{ featured.title }}
+        </a>
+      </h2>
+
+      <p class="font-body text-xl text-ink-700 leading-relaxed max-w-full lg:max-w-md">
+        {{ featured.excerpt|truncatewords:45 }}
+      </p>
+
+      <div class="flex items-center gap-4 mt-6">
+        <span class="font-mono text-[10px] tracking-widest uppercase text-ink-400 font-bold">{{ featured.published_at|date:"N j, Y" }}</span>
+        <span class="text-ink-300">·</span>
+        <span class="font-mono text-[10px] tracking-widest uppercase text-ink-400 font-bold">{{ featured.reading_time }} min read</span>
+      </div>
+    </div>
+
+    <!-- Cover image side -->
+    <div class="md:col-span-12 lg:col-span-7 h-full order-1 lg:order-2">
+      {% if featured.cover_image %}
+      <a href="{{ featured.get_absolute_url }}" class="block w-full group overflow-hidden border border-ink-200">
+        <img src="{{ featured.cover_image.url }}" alt="{{ featured.title }}"
+             class="w-full aspect-[16/9] lg:aspect-[4/3] object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:scale-[1.02] transition-all duration-700" />
+      </a>
+      {% else %}
+      <div class="w-full aspect-[16/9] lg:aspect-[4/3] bg-ink-100 border border-ink-200 flex items-center justify-center">
+        <span class="font-display text-9xl font-black text-ink-200">
+          {{ featured.title|first }}
+        </span>
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>
 {% endif %}
 
 <!-- ── Recent Posts Grid ──────────────────────────────────────────────────── -->
-<section class="max-w-6xl mx-auto px-6 py-12">
+<section class="max-w-[1400px] mx-auto px-6 py-8">
 
-  <div class="flex items-baseline justify-between border-b border-ink-200 pb-3 mb-8">
-    <h2 class="font-display text-2xl font-bold text-ink-900">Recent Writing</h2>
+  <div class="flex items-baseline justify-between border-b-[3px] border-ink-950 pb-2 mb-8">
+    <h2 class="font-display text-2xl font-black text-ink-950 tracking-tight">The Latest</h2>
     <a href="{% url 'blog:post_list' %}"
-       class="font-mono text-xs tracking-widest uppercase text-ink-500 hover:text-ink-900 transition-colors">
-      View all →
+       class="font-mono text-[10px] tracking-widest uppercase font-bold text-ink-950 bg-ink-100 px-3 py-1 hover:bg-ink-900 hover:text-white transition-colors">
+      View All Notes →
     </a>
   </div>
 
   {% if recent_posts %}
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-ink-200">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
     {% for post in recent_posts %}
-    <article class="post-card bg-ink-50 p-6 md:p-8 flex flex-col">
+    <article class="flex flex-col group h-full">
+      
+      <!-- Image Grid -->
+      <a href="{{ post.get_absolute_url }}" class="block w-full mb-3 overflow-hidden border border-ink-200 aspect-[3/2] bg-ink-100 relative">
+        {% if post.cover_image %}
+        <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="w-full h-full object-cover grayscale opacity-95 group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-500" />
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center">
+            <span class="font-display text-5xl font-black text-ink-200">{{ post.title|first|default:"S" }}</span>
+        </div>
+        {% endif %}
+        {% if post.is_ai_generated %}
+        <span class="absolute top-2 right-2 bg-ink-950 text-white font-mono text-[9px] tracking-widest uppercase px-2 py-0.5">✦ AI</span>
+        {% endif %}
+      </a>
 
       <!-- Category + Tags -->
-      <div class="flex items-center gap-2 mb-3 flex-wrap">
+      <div class="flex items-center gap-2 mb-1.5 flex-wrap">
         {% if post.category %}
-        <a href="{{ post.category.get_absolute_url }}"
-           class="font-mono text-xs tracking-wider uppercase text-ink-500 hover:text-ink-900 transition-colors">
+        <a href="{{ post.category.get_absolute_url }}" class="font-mono text-[10px] uppercase font-bold text-ink-600 hover:text-ink-900 transition-colors">
           {{ post.category.name }}
         </a>
-        <span class="text-ink-300 font-mono text-xs">·</span>
+        <span class="text-ink-300 font-mono text-[10px]">|</span>
         {% endif %}
-        <span class="font-mono text-xs text-ink-400">{{ post.published_at|date:"N j" }}</span>
-        {% if post.is_ai_generated %}
-        <span class="ai-badge ml-auto">✦ AI</span>
-        {% endif %}
+        <span class="font-mono text-[10px] tracking-wide uppercase font-bold text-ink-400">{{ post.published_at|date:"N j" }}</span>
       </div>
 
       <!-- Title -->
-      <h3 class="font-display text-xl font-bold leading-snug text-ink-900 mb-3 flex-1">
+      <h3 class="font-display text-xl font-bold leading-tight text-ink-950 mb-2">
         <a href="{{ post.get_absolute_url }}"
-           class="hover:text-ink-500 transition-colors">
+           class="hover:text-ink-600 transition-colors group-hover:underline underline-offset-4 decoration-ink-300">
           {{ post.title }}
         </a>
       </h3>
 
       <!-- Excerpt -->
-      <p class="font-body text-sm text-ink-500 leading-relaxed mb-4 line-clamp-3">
-        {{ post.excerpt|truncatewords:20 }}
+      <p class="font-body text-sm font-medium text-ink-600 leading-snug mb-3 line-clamp-3">
+        {{ post.excerpt|default:""|truncatewords:20 }}
       </p>
 
-      <!-- Meta footer -->
-      <div class="flex items-center justify-between pt-4 border-t border-ink-200 mt-auto">
-        <span class="font-mono text-xs text-ink-400">
-          {% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% endif %}
-        </span>
-        <span class="font-mono text-xs text-ink-400">{{ post.reading_time }} min</span>
+      <div class="mt-auto pt-2 border-t border-ink-200 flex justify-between items-center text-ink-400 font-mono text-[9px] tracking-widest uppercase font-bold">
+         <span>{% if post.author %}{{ post.author.get_full_name|default:post.author.username }}{% endif %}</span>
+         <span>{{ post.reading_time }}m</span>
       </div>
     </article>
     {% endfor %}
   </div>
 
   {% else %}
-  <div class="py-24 text-center">
-    <p class="font-display text-2xl text-ink-300 mb-2">No posts yet.</p>
-    <p class="font-mono text-sm text-ink-400">The blank page awaits.</p>
+  <div class="py-24 text-center border-t border-b border-ink-200">
+    <p class="font-display text-3xl font-bold text-ink-400 mb-2">No posts yet.</p>
+    <p class="kicker text-ink-500">The blank page awaits.</p>
   </div>
   {% endif %}
 </section>
 
 <!-- ── Categories Bar ─────────────────────────────────────────────────────── -->
 {% if categories %}
-<section class="border-t border-ink-200 bg-ink-100">
-  <div class="max-w-6xl mx-auto px-6 py-8">
-    <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-400 mb-5">Browse by Topic</p>
-    <div class="flex flex-wrap gap-3">
+<section class="border-t-4 border-ink-950 bg-white">
+  <div class="max-w-[1400px] mx-auto px-6 py-10">
+    <p class="font-display font-bold text-2xl text-ink-950 mb-5">Browse by Topic</p>
+    <div class="flex flex-wrap gap-4">
       {% for cat in categories %}
       <a href="{{ cat.get_absolute_url }}"
-         class="group flex items-center gap-2 border border-ink-300 px-4 py-2 hover:border-ink-900 hover:bg-ink-900 hover:text-ink-50 transition-all duration-200">
-        <span class="font-body text-sm text-ink-700 group-hover:text-ink-50">{{ cat.name }}</span>
-        <span class="font-mono text-xs text-ink-400 group-hover:text-ink-400">{{ cat.post_count }}</span>
+         class="group flex items-center justify-between min-w-[200px] border-b border-ink-300 pb-2 hover:border-ink-950 transition-all duration-200">
+        <span class="font-body text-lg font-medium text-ink-800 group-hover:text-ink-950">{{ cat.name }}</span>
+        <span class="font-mono text-sm text-ink-400 group-hover:text-ink-950">{{ cat.post_count }}</span>
       </a>
       {% endfor %}
     </div>

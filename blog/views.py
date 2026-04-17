@@ -61,6 +61,9 @@ def post_list(request):
     except EmptyPage:
         page = paginator.page(paginator.num_pages)
 
+    if request.headers.get('HX-Request'):
+        return render(request, "blog/partials/post_list_items.html", {"page": page})
+        
     return render(request, "blog/post_list.html", {"page": page})
 
 
@@ -98,6 +101,8 @@ def post_detail(request, slug):
                 request,
                 "Your comment has been submitted and is awaiting approval. Thank you!",
             )
+            if request.headers.get('HX-Request'):
+                return render(request, "blog/partials/comment.html", {"comment": comment})
             return redirect(post.get_absolute_url())
 
     return render(
@@ -179,6 +184,9 @@ def search(request):
             .select_related("author", "category")
             .distinct()
         )
+
+    if request.headers.get('HX-Request'):
+        return render(request, "blog/partials/search_live_results.html", {"query": query, "results": results})
 
     return render(
         request,

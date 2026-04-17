@@ -10,6 +10,10 @@ TONE_CHOICES = [
     ("Technical and precise, developer-audience", "Technical & Precise"),
 ]
 
+LANGUAGE_CHOICES = [
+    ("Indonesian", "Bahasa Indonesia"),
+    ("English", "English"),
+]
 
 class GeneratePostForm(forms.Form):
     topic = forms.CharField(
@@ -31,9 +35,16 @@ class GeneratePostForm(forms.Form):
             attrs={
                 "placeholder": "e.g. Software developers, startup founders",
                 "class": "form-input",
+                "list": "audience_list",
             }
         ),
         label="Target Audience",
+    )
+    language = forms.ChoiceField(
+        choices=LANGUAGE_CHOICES,
+        initial="Indonesian",
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Language / Bahasa",
     )
     tone = forms.ChoiceField(
         choices=TONE_CHOICES,

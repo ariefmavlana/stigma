@@ -50,13 +50,7 @@ def _build_llm() -> LLM:
         api_key=api_key,
         temperature=1,
         top_p=0.95,
-        # Reduced from 16384 → 8192: sufficient for 1200-word posts, ~2x faster
-        max_tokens=8192,
-        extra_body={
-            "chat_template_kwargs": {"enable_thinking": True},
-            # Reduced from 8192 → 4096: faster thinking without quality loss
-            "reasoning_budget": 4096,
-        },
+        max_tokens=4096,
     )
 
 
@@ -110,9 +104,11 @@ class BlogWriterCrew:
 
     @agent
     def content_editor(self) -> Agent:
+        from .tools import SearchBlogTool
         return Agent(
             config=self.agents_config["content_editor"],  # type: ignore[index]
             llm=_build_llm(),
+            tools=[SearchBlogTool()],
             verbose=True,
             max_iter=5,
             max_execution_time=600,

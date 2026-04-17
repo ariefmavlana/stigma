@@ -105,6 +105,21 @@
 
     /* Prose styles for rendered markdown */
     .prose-stigma { font-family: 'IBM Plex Serif', Georgia, serif; line-height: 1.85; }
+    
+    /* Drop Cap */
+    .prose-stigma > p:first-of-type::first-letter {
+      font-family: 'Playfair Display', serif;
+      float: left;
+      font-size: 5rem;
+      line-height: 4rem;
+      padding-top: 0.15em;
+      padding-right: 0.15em;
+      padding-left: 0.05em;
+      margin-bottom: -0.1em;
+      font-weight: 900;
+      color: var(--ink-950);
+    }
+
     .prose-stigma h2 {
       font-family: 'Playfair Display', serif;
       font-size: 1.6rem;
@@ -159,15 +174,20 @@
     /* Form inputs */
     .form-input, .form-textarea, .form-select {
       width: 100%;
-      padding: 0.65rem 0.875rem;
-      border: 1px solid var(--ink-300);
-      background: white;
+      padding: 0.65rem 0;
+      border: none;
+      border-bottom: 1px solid var(--ink-400);
+      background: transparent;
       color: var(--ink-900);
       font-family: 'IBM Plex Serif', serif;
-      font-size: 0.95rem;
-      transition: border-color 0.15s;
+      font-size: 1rem;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
       outline: none;
       border-radius: 0;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-bottom-color: var(--ink-900);
+      background: rgba(0,0,0,0.02);
     }
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       border-color: var(--ink-900);
@@ -204,8 +224,18 @@
 
     /* Masthead line */
     .masthead-rule {
-      height: 3px;
-      background: var(--ink-900);
+      border-top: 4px solid var(--ink-950);
+      border-bottom: 1px solid var(--ink-950);
+      height: 6px;
+      margin: 4px 0;
+    }
+    
+    .kicker {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--ink-600);
     }
 
     /* Search bar */
@@ -223,63 +253,106 @@
     .search-bar::placeholder { color: var(--ink-400); }
     .search-bar:focus { border-bottom-color: var(--ink-900); }
   </style>
+  <style>
+    /* Global HTMX Progress Bar */
+    #htmx-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: #000;
+      z-index: 10000;
+      transition: width 300ms ease, opacity 300ms ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .htmx-request #htmx-progress {
+      opacity: 1;
+      width: 40%;
+    }
+    .htmx-request.htmx-settling #htmx-progress {
+      width: 100%;
+    }
+  </style>
 
   <link rel="stylesheet" href="{% static 'css/stigma.css' %}" />
   {% block extra_head %}{% endblock %}
 </head>
 
-<body class="bg-ink-50 text-ink-900 font-body antialiased">
+<body class="bg-ink-50 text-ink-900 font-body antialiased"
+      hx-boost="true"
+      _="on htmx:beforeRequest add .htmx-request to #htmx-progress
+         on htmx:afterRequest remove .htmx-request from #htmx-progress">
+
+  <!-- HTMX Global Progress -->
+  <div id="htmx-progress"></div>
 
   <!-- ── Masthead ──────────────────────────────────────────────────────────── -->
   <header class="border-b border-ink-200">
     <!-- Top utility bar -->
     <div class="border-b border-ink-200 py-2">
-      <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
+      <div class="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
         <div class="flex items-center gap-4 text-xs font-mono text-ink-500 tracking-widest uppercase">
           <span>{% now "l, N j, Y" %}</span>
         </div>
-        <div class="flex items-center gap-5 text-xs font-mono tracking-wider uppercase">
-          <a href="{% url 'blog:search' %}" class="text-ink-500 hover:text-ink-900 transition-colors">Search</a>
+        <div class="flex items-center gap-5 text-xs font-mono tracking-wider uppercase relative">
+          <!-- Expanding live search via HTMX & Hyperscript -->
+          <form action="{% url 'blog:search' %}" method="get" class="relative flex items-center group"
+                hx-get="{% url 'blog:search' %}"
+                hx-trigger="keyup changed delay:300ms from:#search-input, search from:#search-input"
+                hx-target="#search-results-dropdown"
+                _="on submit if #search-input.value == '' halt">
+            <input id="search-input" type="search" name="q" placeholder="Type to search..." autocomplete="off"
+                   class="search-bar w-0 opacity-0 overflow-hidden transition-all duration-300 ease-out focus:w-64 focus:opacity-100 pl-2 pr-6 text-ink-900 border-b-2"
+                   _="on focusin remove .w-0 from me then remove .opacity-0 from me then add .w-64 to me then add .opacity-100 to me then remove .hidden from #search-results-dropdown
+                      on keydown[key=='Escape'] remove .w-64 from me then remove .opacity-100 from me then add .w-0 to me then add .opacity-0 to me then add .hidden to #search-results-dropdown then my.blur()
+                      on click from document force if target is not me and target is not in my.closest('form') add .hidden to #search-results-dropdown" />
+            <div id="search-results-dropdown" class="absolute top-10 right-0 w-[400px] bg-white border-2 border-ink-950 shadow-2xl z-50 hidden empty:hidden"></div>
+            
+            <button type="button" class="text-ink-500 hover:text-ink-900 transition-colors z-10"
+                    _="on click call #search-input.focus()">Search</button>
+          </form>
           <a href="{% url 'blog:about' %}" class="text-ink-500 hover:text-ink-900 transition-colors">About</a>
           {% if user.is_staff %}
-          <a href="{% url 'ai_crew:generate' %}" class="text-ink-900 font-semibold">✦ AI Generate</a>
+          <a href="{% url 'ai_crew:generate' %}" class="text-ink-900 font-semibold border border-ink-900 px-2 py-0.5 hover:bg-ink-900 hover:text-ink-50 transition-colors">✦ Generate</a>
           {% endif %}
         </div>
       </div>
     </div>
 
     <!-- Nameplate -->
-    <div class="py-8 text-center">
-      <a href="{% url 'blog:home' %}" class="inline-block group">
-        <h1 class="font-display text-5xl md:text-7xl font-black tracking-tight text-ink-950 leading-none">
+    <div class="py-5 text-center flex flex-col items-center">
+      <a href="{% url 'blog:home' %}" class="inline-block group mb-1">
+        <h1 class="font-display text-5xl md:text-7xl font-black tracking-tight text-ink-950 leading-none" style="letter-spacing: -0.04em;">
           {{ BLOG_NAME }}
         </h1>
-        <p class="font-mono text-xs tracking-[0.3em] uppercase text-ink-500 mt-2">
-          {{ BLOG_TAGLINE }}
-        </p>
       </a>
+      <p class="font-mono text-[10px] tracking-widest uppercase text-ink-500 border-t border-ink-300 pt-1 w-2/3 md:w-1/3">
+        {{ BLOG_TAGLINE }}
+      </p>
     </div>
 
     <!-- Navigation -->
-    <nav class="border-t border-ink-200">
-      <div class="max-w-6xl mx-auto px-6">
-        <ul class="flex items-center gap-6 py-3 overflow-x-auto">
+    <nav class="border-t border-b-2 border-ink-950">
+      <div class="max-w-[1400px] mx-auto px-6">
+        <ul class="flex items-center gap-6 py-2 overflow-x-auto">
           <li>
             <a href="{% url 'blog:home' %}"
-               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1">
+               class="nav-link font-mono text-xs tracking-widest font-bold uppercase text-ink-900 hover:text-ink-600 transition-colors py-1">
               Home
             </a>
           </li>
           <li>
             <a href="{% url 'blog:post_list' %}"
-               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1">
+               class="nav-link font-mono text-xs tracking-widest font-bold uppercase text-ink-900 hover:text-ink-600 transition-colors py-1">
               All Posts
             </a>
           </li>
           {% for cat in global_categories %}
           <li>
             <a href="{{ cat.get_absolute_url }}"
-               class="nav-link font-mono text-xs tracking-widest uppercase text-ink-700 hover:text-ink-950 transition-colors py-1 whitespace-nowrap">
+               class="nav-link font-mono text-xs tracking-widest font-bold uppercase text-ink-900 hover:text-ink-600 transition-colors py-1 whitespace-nowrap">
               {{ cat.name }}
             </a>
           </li>
@@ -287,8 +360,6 @@
         </ul>
       </div>
     </nav>
-
-    <div class="masthead-rule"></div>
   </header>
 
   <!-- ── Messages ─────────────────────────────────────────────────────────── -->

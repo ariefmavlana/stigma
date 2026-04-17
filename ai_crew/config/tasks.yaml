@@ -20,7 +20,8 @@ research_task:
 
     Target audience: {target_audience}
     Tone guidance: {tone}
-
+    Language: The generated research brief should be in {language}.
+    
     Be rigorous. If you cannot verify a fact, mark it as [UNVERIFIED].
   expected_output: >
     A structured Markdown research brief with all 7 sections filled out.
@@ -43,6 +44,7 @@ write_task:
       advance the narrative, not repeat previous content.
     - **Closing**: End with an insight or a call-to-reflection, not a summary list.
     - **Voice**: {tone}
+    - **Language**: MUST clearly be written in {language}.
     - **Audience**: {target_audience}
     - **No fluff**: Remove any sentence that could be deleted without losing meaning.
 
@@ -68,7 +70,10 @@ edit_task:
        and the meta description.
     3. **Fact-Check** — Cross-reference claims against the research brief.
        Flag any [UNVERIFIED] items — either remove or contextualise them.
-    4. **Structure Review** — Does the post flow logically? Are sections the
+    4. **Auto-Internal Linking** — Use the `search_blog_tool` to find 2-3 existing 
+       published posts related to your topic. Integrate them naturally into 
+       the body using Markdown links: `[Post Title](/posts/slug/)`.
+    5. **Structure Review** — Does the post flow logically? Are sections the
        right length? Is the opening strong?
 
     Then produce your final output as a **valid JSON object** with this exact schema:
@@ -78,11 +83,14 @@ edit_task:
       "excerpt": "Punchy 1–2 sentence excerpt for listing pages (max 280 chars)",
       "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
       "reading_time_minutes": <integer>,
-      "body": "The complete polished post in Markdown (escaped for JSON)"
+      "body": "The complete polished post in Markdown (escaped for JSON)",
+      "social_twitter": ["Tweet 1 of thread (hook)", "Tweet 2 (fact)", "Tweet 3 (link)"],
+      "social_linkedin": "A professional summary for LinkedIn with relevant hashtags",
+      "newsletter_copy": "A condensed, punchy summary for email newsletters"
     }}
 
     CRITICAL: Output ONLY the JSON object. No preamble, no explanation, no
-    Markdown fences. Just the raw JSON.
+    Markdown fences. Just the raw JSON. Ensure the content language strictly matches {language}.
   expected_output: >
     A single, valid JSON object matching the schema above.
     The body field contains the complete polished Markdown post.

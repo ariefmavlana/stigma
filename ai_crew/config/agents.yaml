@@ -24,7 +24,7 @@ topic_researcher:
     actionable insight.
   verbose: true
   allow_delegation: false
-  max_iter: 10
+  max_iter: 3
 
 # ── Agent 2: Content Writer ──────────────────────────────────────────────────
 content_writer:
@@ -48,7 +48,7 @@ content_writer:
     never use filler phrases like "In conclusion" or "As we can see."
   verbose: true
   allow_delegation: false
-  max_iter: 10
+  max_iter: 3
 
 # ── Agent 3: Content Editor ──────────────────────────────────────────────────
 content_editor:
@@ -74,4 +74,4 @@ content_editor:
     to the desk.
   verbose: true
   allow_delegation: false
-  max_iter: 10
+  max_iter: 3

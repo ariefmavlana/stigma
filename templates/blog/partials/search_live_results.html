@@ -1,0 +1,26 @@
+{% if results %}
+  <div class="px-4 py-3 bg-ink-950 text-white font-mono text-[10px] tracking-widest uppercase font-bold flex justify-between">
+    <span>Results</span>
+    <span>{{ results.count }} found</span>
+  </div>
+  <ul class="max-h-96 overflow-y-auto divide-y divide-ink-100">
+    {% for post in results|slice:":5" %}
+    <li class="p-4 hover:bg-ink-50 cursor-pointer transition-colors" _="on click window.location = '{{ post.get_absolute_url }}'">
+      <p class="font-mono text-[9px] tracking-widest text-ink-500 uppercase font-bold mb-1">{{ post.category.name|default:"Uncategorized" }}</p>
+      <p class="font-display font-black text-ink-950 leading-tight mb-1">{{ post.title }}</p>
+      <p class="font-body text-xs text-ink-500 line-clamp-1">{{ post.excerpt|default:"" }}</p>
+    </li>
+    {% endfor %}
+    {% if results.count > 5 %}
+    <li class="p-4 bg-ink-50/50 hover:bg-ink-100 border-t border-ink-200 cursor-pointer text-center group"
+        _="on click window.location = '{% url 'blog:search' %}?q={{ query|urlencode }}'">
+      <span class="font-mono text-[10px] tracking-widest font-bold uppercase text-ink-950 group-hover:underline">View all results →</span>
+    </li>
+    {% endif %}
+  </ul>
+{% elif query %}
+  <div class="p-6 text-center">
+    <p class="font-display font-bold text-ink-950 mb-1">No results found.</p>
+    <p class="font-mono text-[10px] tracking-widest uppercase text-ink-400">Try a different keyword.</p>
+  </div>
+{% endif %}

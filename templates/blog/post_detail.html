@@ -3,7 +3,11 @@
 {% block meta_description %}{{ post.excerpt|truncatechars:155 }}{% endblock %}
 
 {% block content %}
-<article class="max-w-6xl mx-auto px-6">
+<!-- Reading Progress Bar -->
+<div id="reading-progress" class="fixed top-0 left-0 h-1.5 bg-ink-950 z-50 w-0"
+     _="on scroll from window set height to document.documentElement.scrollHeight - window.innerHeight then set percent to (window.scrollY / height) * 100 then if percent < 0 set percent to 0 then if percent > 100 set percent to 100 then set my.style.width to percent + '%'"></div>
+
+<article class="max-w-[1400px] mx-auto px-6">
 
   <!-- ── Article Header ──────────────────────────────────────────────────── -->
   <header class="pt-12 pb-8 border-b border-ink-200 max-w-3xl">
@@ -41,7 +45,7 @@
 
     <!-- Excerpt / standfirst -->
     {% if post.excerpt %}
-    <p class="font-body text-xl text-ink-600 leading-relaxed italic border-l-4 border-ink-900 pl-4">
+    <p class="font-body text-2xl text-ink-800 leading-snug border-l-[6px] border-ink-950 pl-6 my-8 font-medium italic">
       {{ post.excerpt }}
     </p>
     {% endif %}
@@ -165,27 +169,20 @@
       {% endif %}
     </h2>
 
-    <!-- Existing comments -->
-    {% if comments %}
-    <div class="space-y-8 mb-12">
-      {% for comment in comments %}
-      <div class="border-l-2 border-ink-200 pl-5">
-        <div class="flex items-baseline gap-3 mb-2">
-          <span class="font-body font-semibold text-ink-900 text-sm">{{ comment.author_name }}</span>
-          <span class="font-mono text-xs text-ink-400">{{ comment.created_at|date:"N j, Y · g:i A" }}</span>
-        </div>
-        <p class="font-body text-sm text-ink-600 leading-relaxed">{{ comment.body }}</p>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <p class="font-body text-ink-400 italic mb-10">No comments yet. Be the first to share your thoughts.</p>
-    {% endif %}
-
-    <!-- Comment form -->
-    <div class="border border-ink-200 p-6 md:p-8">
+    <!-- Comment Form -->
+    <div class="bg-ink-100 p-6 md:p-8 mb-12">
       <h3 class="font-display text-xl font-bold text-ink-900 mb-6">Leave a Comment</h3>
-      <form method="post" action="{{ request.path }}" class="space-y-5">
+      <form hx-post="{{ request.path }}"
+            hx-target="#comments-list"
+            hx-swap="beforeend"
+            hx-on::after-request="if(event.detail.successful) this.reset()"
+            class="space-y-5"
+            _="on submit 
+               add .pointer-events-none to me 
+               transition my opacity to 0.5 over 200ms
+               then wait 500ms
+               remove .pointer-events-none from me
+               transition my opacity to 1 over 200ms">
         {% csrf_token %}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
@@ -207,12 +204,27 @@
           </label>
           {{ comment_form.body }}
         </div>
-        <p class="font-mono text-xs text-ink-400">Comments are moderated and will appear after approval.</p>
+        <p class="font-mono text-xs text-ink-400">Comments are momentarily moderated.</p>
         <button type="submit"
                 class="font-mono text-xs tracking-widest uppercase bg-ink-950 text-ink-50 px-6 py-3 hover:bg-ink-700 transition-colors">
           Submit Comment →
         </button>
       </form>
+    </div>
+
+    <!-- Existing comments -->
+    <div id="comments-list" class="space-y-8 mb-12">
+      {% for comment in comments %}
+      <div class="border-l-2 border-ink-200 pl-5">
+        <div class="flex items-baseline gap-3 mb-2">
+          <span class="font-body font-semibold text-ink-900 text-sm">{{ comment.author_name }}</span>
+          <span class="font-mono text-xs text-ink-400">{{ comment.created_at|date:"N j, Y · g:i A" }}</span>
+        </div>
+        <p class="font-body text-sm text-ink-600 leading-relaxed">{{ comment.body }}</p>
+      </div>
+      {% empty %}
+      <p id="empty-comments-message" class="font-body text-ink-400 italic mb-10" _="on DOMNodeInserted from #comments-list add .hidden to me">No comments yet. Be the first to share your thoughts.</p>
+      {% endfor %}
     </div>
   </section>
 

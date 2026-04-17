@@ -2,38 +2,50 @@
 {% block title %}About{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-6 py-16">
-  <div class="masthead-rule mb-10"></div>
-  <h1 class="font-display text-5xl font-black text-ink-950 mb-8">About STIgma</h1>
-  <div class="prose-stigma text-base space-y-6">
-    <p class="text-xl text-ink-600 italic leading-relaxed">
-      STIgma is a place for long-form writing that respects your intelligence.
-      No algorithmic noise. No engagement bait. Just ideas, explored carefully.
-    </p>
-    <p>
-      This publication is powered by <strong>Django</strong> and <strong>CrewAI</strong> —
-      a trio of AI agents (Researcher, Writer, Editor) that can assist in drafting
-      posts which are then reviewed and published by human editors.
-    </p>
-    <p>
-      Every AI-assisted post is clearly marked with the <span class="ai-badge inline-flex">✦ AI-Assisted</span>
-      badge. We believe in transparency: AI helps us research and draft at speed,
-      but every published word has been reviewed by a human.
-    </p>
-    <h2>The Stack</h2>
-    <ul>
-      <li><strong>Backend</strong> — Python 3.12, Django, PostgreSQL 17</li>
-      <li><strong>AI</strong> — CrewAI with specialist agents for research, writing, and editing</li>
-      <li><strong>Frontend</strong> — TailwindCSS, editorial monochrome design</li>
-      <li><strong>Package management</strong> — uv</li>
-    </ul>
-    <h2>Philosophy</h2>
-    <p>
-      The name <em>STIgma</em> is deliberate. Before digital publishing,
-      the stigma was where ideas transformed into permanence. We hold to that
-      standard: every post should be worth the ink.
-    </p>
+<div class="max-w-[1400px] mx-auto px-6 py-12 md:py-16">
+  
+  <div class="border-t-4 border-b border-ink-950 py-10 mb-12">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <!-- Title Sidebar -->
+      <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-ink-200 pb-8 lg:pb-0 lg:pr-12">
+        <p class="font-mono text-[10px] tracking-widest uppercase text-ink-500 font-bold mb-4">Our Mission</p>
+        <h1 class="font-display text-5xl md:text-7xl font-black text-ink-950 leading-none tracking-tight">
+          About <br/>STIgma
+        </h1>
+      </div>
+
+      <!-- Content Area -->
+      <div class="lg:col-span-8">
+        <p class="font-display text-2xl md:text-3xl font-bold text-ink-900 leading-snug mb-8">
+          STIgma is a place for long-form writing that respects your intelligence.
+          No algorithmic noise. No engagement bait. Just ideas, explored carefully.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+          <div>
+            <h2 class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950 border-b border-ink-950 pb-2 mb-4">The Platform</h2>
+            <p class="font-body text-sm text-ink-700 leading-relaxed mb-4">
+              This publication is powered by <strong>Django</strong> and <strong>CrewAI</strong>. It utilizes a trio of sophisticated AI agents (Researcher, Writer, Editor) that assist in drafting comprehensive deep-dives.
+            </p>
+            <p class="font-body text-sm text-ink-700 leading-relaxed">
+              Every AI-assisted post is clearly marked with the <span class="bg-ink-950 text-white font-mono text-[9px] px-1 py-0.5 ml-1">✦ AI</span> badge. Transparency is non-negotiable: while AI accelerates coverage, every published word is curated and verified by human editors.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950 border-b border-ink-950 pb-2 mb-4">The Stack</h2>
+            <ul class="font-body text-sm text-ink-700 leading-relaxed border-l-2 border-ink-200 pl-4 space-y-2">
+              <li><strong>Framework:</strong> Python 3.12, Django 5.x</li>
+              <li><strong>Database:</strong> PostgreSQL 17</li>
+              <li><strong>Intelligence:</strong> CrewAI (Llama Models / OpenAI)</li>
+              <li><strong>Design:</strong> STIgma Monochrome Engine, Tailwind</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
-  <div class="masthead-rule mt-12"></div>
+
 </div>
 {% endblock %}

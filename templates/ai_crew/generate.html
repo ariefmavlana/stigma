@@ -2,159 +2,154 @@
 {% block title %}AI Post Generator{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-6 py-12" _="on load transition my opacity from 0 to 1 over 500ms">
+<div class="max-w-[1400px] mx-auto px-6 py-12 md:py-16" _="on load transition my opacity from 0 to 1 over 500ms">
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
-  <div class="border-b-2 border-ink-950 pb-8 mb-12">
-    <div class="flex items-center gap-3 mb-6">
-      <span class="font-mono text-[10px] tracking-[0.4em] uppercase text-white bg-ink-950 px-3 py-1 font-bold">
-        Internal / Editorial
-      </span>
-      <span class="bg-ink-100 text-ink-900 font-mono text-[10px] tracking-wider uppercase px-2 py-1 border border-ink-300">
-        ✦ AI Pipeline v2.0
-      </span>
-    </div>
-    <h1 class="font-display text-5xl font-black text-ink-950 mb-4 tracking-tighter">AI Content Engine</h1>
-    <p class="font-body text-ink-500 leading-relaxed max-w-2xl">
-      Deploy a three-agent CrewAI pipeline (Research → Write → Edit). 
-      The system handles deep web searches and delivers high-fidelity 
-      editorial drafts directly to your database.
-    </p>
-  </div>
-
-  <!-- ── Agent Pipeline ─────────────────────────────────────────────────── -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-1 mb-12 bg-ink-200 border border-ink-200 p-1">
-    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
-      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 01</p>
-      <p class="font-body text-sm font-black text-ink-900">Researcher</p>
-      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">SerperDev + WebRAG</p>
-    </div>
-    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
-      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 02</p>
-      <p class="font-body text-sm font-black text-ink-900">Writer</p>
-      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">markdown_v2 · 1.2k words</p>
-    </div>
-    <div class="bg-white p-4 group hover:bg-ink-50 transition-colors">
-      <p class="font-mono text-[9px] text-ink-400 uppercase tracking-widest mb-2">Stage 03</p>
-      <p class="font-body text-sm font-black text-ink-900">Editor</p>
-      <p class="font-mono text-[10px] text-ink-500 mt-1 lowercase">seo_audit · structured_json</p>
-    </div>
-  </div>
-
-  <!-- ── Generation Form ────────────────────────────────────────────────── -->
-  <div id="form-container">
-    <form id="generate-form" 
-          hx-post="{% url 'ai_crew:generate' %}"
-          hx-target="#status-panel"
-          hx-swap="outerHTML"
-          hx-on::after-request="if(event.detail.successful) this.reset()"
-          _="on submit 
-             transition #form-container opacity to 0 over 300ms 
-             then add .hidden to #form-container
-             remove .hidden from #status-panel"
-          class="space-y-8">
-      {% csrf_token %}
-
-      {% for field in form %}
-      <div class="group">
-        <label class="block font-mono text-xs tracking-widest uppercase text-ink-900 font-black mb-3 group-focus-within:text-ink-500 transition-colors">
-          {{ field.label }}
-          {% if field.field.required %}<span class="text-ink-300 ml-1">#req</span>{% endif %}
-        </label>
-        {{ field }}
-        {% if field.help_text %}
-        <p class="font-mono text-[10px] text-ink-400 mt-2 italic capitalize tracking-wide">{{ field.help_text }}</p>
-        {% endif %}
-        {% for error in field.errors %}
-        <p class="font-mono text-xs text-red-600 mt-2 font-bold">{{ error }}</p>
-        {% endfor %}
-      </div>
-      {% endfor %}
-
-      <div class="border-2 border-dashed border-ink-200 p-6 bg-ink-50/50">
-        <p class="font-mono text-[11px] text-ink-500 leading-relaxed">
-          <strong class="text-ink-950">Architecture Note:</strong> This pipeline uses NVIDIA NIM 
-          for high-speed reasoning. Average duration is 120s. Result will be stored as 
-          an unpublished <code>Draft</code> for manual verification.
-        </p>
-      </div>
-
-      <button type="submit" id="submit-btn"
-              class="w-full group relative overflow-hidden bg-ink-950 text-white py-5 transition-all duration-300 hover:bg-black active:scale-[0.99]">
-        <div class="relative z-10 flex items-center justify-center gap-4 font-mono text-xs tracking-[0.4em] uppercase font-bold">
-          <span>Initialize Generation</span>
-          <span class="opacity-30 group-hover:opacity-100 transition-opacity">✦</span>
-        </div>
-        <!-- Button hover effect line -->
-        <div class="absolute bottom-0 left-0 h-1 bg-white w-0 group-hover:w-full transition-all duration-500"></div>
-      </button>
-    </form>
-  </div>
-
-  <!-- ── Status Panel Placeholder ─────────────────────────────────────── -->
-  <div id="status-panel" class="hidden">
-      <!-- Content will be replaced by HTMX Runner Partial -->
-  </div>
-
-  <!-- ── Recent Activity ──────────────────────────────────────────────── -->
-  {% if recent_ai_posts %}
-  <div id="recent-posts-section" class="mt-24 border-t-4 border-ink-950 pt-10">
-    <div class="flex items-baseline justify-between mb-8">
-      <p class="font-mono text-[11px] tracking-[0.5em] uppercase text-ink-900 font-black">History / Logs</p>
-      <a href="/admin/blog/post/?is_ai_generated__exact=1"
-         class="font-mono text-[10px] text-ink-400 hover:text-ink-950 transition-colors uppercase tracking-widest border-b border-transparent hover:border-ink-950 pb-0.5">
-        Master Logs →
-      </a>
-    </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
     
-    <div class="overflow-hidden border border-ink-200">
-      <table class="w-full text-left font-mono text-xs">
-        <thead class="bg-ink-50 border-b border-ink-200">
-          <tr>
-            <th class="px-4 py-3 text-ink-400 font-normal uppercase tracking-widest uppercase">ID/Status</th>
-            <th class="px-4 py-3 text-ink-900 font-bold uppercase tracking-widest">Post Title</th>
-            <th class="px-4 py-3 text-right"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-ink-100">
-          {% for post in recent_ai_posts %}
-          <tr class="hover:bg-ink-50 transition-colors group">
-            <td class="px-4 py-4 whitespace-nowrap">
-              <span class="inline-block w-1.5 h-1.5 rounded-full mr-2 
-                {% if post.status == 'published' %}bg-green-500{% else %}bg-ink-300 shadow-[0_0_5px_rgba(0,0,0,0.1)]{% endif %}"></span>
-              <span class="text-ink-400 uppercase text-[10px] tracking-tighter">{{ post.status }}</span>
-            </td>
-            <td class="px-4 py-4">
-              <p class="text-ink-900 font-medium line-clamp-1 group-hover:underline">{{ post.title }}</p>
-            </td>
-            <td class="px-4 py-4 text-right">
-              <a href="/admin/blog/post/{{ post.pk }}/change/"
-                 class="text-ink-400 hover:text-ink-950 transition-colors">
-                [Edit]
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  {% endif %}
+    <!-- ── Left Column: Form ────────────────────────────────────────────────── -->
+    <div class="lg:col-span-7">
+      <div class="border-b-4 border-ink-950 pb-8 mb-8" id="form-container">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="font-mono text-[10px] tracking-widest uppercase font-bold text-ink-950 bg-ink-200 px-2 py-0.5">
+            Internal Platform
+          </span>
+          <span class="font-mono text-[10px] tracking-[0.2em] font-bold text-white bg-ink-950 px-2 py-0.5">
+            ✦ CrewAI Pipeline v2.0
+          </span>
+        </div>
+        <h1 class="font-display text-5xl md:text-6xl font-black text-ink-950 leading-none tracking-tight mb-8">
+          AI Generation <br/>Engine
+        </h1>
 
+        <datalist id="audience_list">
+          <option value="Curious, intelligent readers interested in technology and ideas"></option>
+          <option value="Software developers and engineering leaders"></option>
+          <option value="Startup founders and tech entrepreneurs"></option>
+          <option value="General public (easy to understand)"></option>
+          <option value="Akademisi dan mahasiswa (Academic/Students)"></option>
+          <option value="Profesional IT dan pemerhati teknologi"></option>
+        </datalist>
+
+        <form id="generate-form" 
+              hx-post="{% url 'ai_crew:generate' %}"
+              hx-target="#status-panel"
+              hx-swap="outerHTML"
+              hx-on::after-request="if(event.detail.successful) this.reset()"
+              _="on submit 
+                 transition #form-container opacity to 0.4 over 300ms 
+                 then add .pointer-events-none to me
+                 remove .hidden from #status-panel"
+              class="space-y-6 {% if active_task_id %}hidden{% endif %}">
+          {% csrf_token %}
+
+          {% for field in form %}
+          <div class="group border-t border-ink-200 pt-4">
+            <label class="block font-mono text-[10px] tracking-widest uppercase font-bold text-ink-900 mb-2">
+              {{ field.label }}
+              {% if field.field.required %}<span class="text-ink-400 font-normal ml-1">#REQ</span>{% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}
+            <p class="font-mono text-[10px] text-ink-400 mt-2 font-bold tracking-wide uppercase">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+            <p class="font-mono text-[10px] text-red-600 mt-2 font-bold uppercase">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endfor %}
+
+          <div class="pt-8">
+            <button type="submit" id="submit-btn"
+                    class="w-full bg-ink-950 text-white py-4 transition-colors hover:bg-ink-700">
+              <span class="font-mono text-[11px] tracking-widest uppercase font-bold">
+                Deploy Pipeline →
+              </span>
+            </button>
+            <p class="font-mono text-[9px] text-center text-ink-400 mt-3 uppercase tracking-widest font-bold">
+              Average duration: ~120s. Results saved as unpublished drafts.
+            </p>
+          </div>
+        </form>
+      </div>
+
+      <!-- ── Status Panel Placeholder ─────────────────────────────────────── -->
+      {% if active_task_id %}
+      <div id="status-panel" 
+           hx-get="{% url 'ai_crew:task_status' active_task_id %}" 
+           hx-trigger="load" 
+           hx-swap="outerHTML"
+           class="mt-10 border border-ink-950 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)] p-6 text-center animate-pulse">
+          <p class="font-mono text-xs uppercase tracking-widest font-bold text-ink-500">Resuming active pipeline connection...</p>
+      </div>
+      {% else %}
+      <div id="status-panel" class="hidden"></div>
+      {% endif %}
+    </div>
+
+    <!-- ── Right Column: Pipeline Details & History ───────────────────────── -->
+    <div class="lg:col-span-5 lg:pl-12 lg:border-l border-ink-200">
+      
+      <!-- ── Agent Pipeline ───────────────────────────────────────────────── -->
+      <div class="mb-12">
+        <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950 border-b border-ink-950 pb-2 mb-6">Orchestration</p>
+        
+        <div class="space-y-4">
+          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
+            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 01</div>
+            <p class="font-display text-xl font-bold text-ink-950 mb-1">Researcher</p>
+            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Tools: SerperDev + WebRAG</p>
+          </div>
+          
+          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
+            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 02</div>
+            <p class="font-display text-xl font-bold text-ink-950 mb-1">Writer</p>
+            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Target: Markdown_v2 · 1.2k words</p>
+          </div>
+          
+          <div class="border border-ink-200 p-4 relative overflow-hidden group hover:border-ink-950 transition-colors bg-white">
+            <div class="absolute top-0 right-0 p-2 bg-ink-100 font-mono text-[8px] font-bold text-ink-500 uppercase tracking-widest">Stage 03</div>
+            <p class="font-display text-xl font-bold text-ink-950 mb-1">Editor</p>
+            <p class="font-mono text-[10px] tracking-wide text-ink-600 uppercase font-bold">Audit: SEO Audit & Structure</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Recent Activity ──────────────────────────────────────────────── -->
+      {% if recent_ai_posts %}
+      <div>
+        <div class="flex items-baseline justify-between border-b border-ink-950 pb-2 mb-6">
+          <p class="font-mono text-xs tracking-widest uppercase font-bold text-ink-950">Recent Artifacts</p>
+        </div>
+        
+        <ul class="space-y-4">
+          {% for post in recent_ai_posts %}
+          <li class="border-b border-ink-200 pb-4 last:border-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="inline-block w-2 h-2 rounded-full {% if post.status == 'published' %}bg-ink-950{% else %}border border-ink-400 bg-white{% endif %}"></span>
+              <span class="font-mono text-[9px] tracking-widest uppercase font-bold text-ink-500">{{ post.status }}</span>
+              <a href="/admin/blog/post/{{ post.pk }}/change/" class="ml-auto font-mono text-[9px] tracking-widest font-bold text-ink-950 hover:underline uppercase">Edit →</a>
+            </div>
+            <p class="font-body text-sm font-bold text-ink-900 line-clamp-2">
+              {{ post.title }}
+            </p>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
 </div>
 
-<!-- Styles for specific custom effects -->
 <style>
-  input[type="text"], select, textarea {
-    @apply w-full border-2 border-ink-100 bg-white px-5 py-4 font-mono text-sm transition-all duration-200;
+  /* Form Element Overrides matching the CMS aesthetic */
+  form input[type="text"], form select, form textarea {
+    @apply w-full border-none border-b-2 border-ink-300 bg-transparent px-0 py-2 font-body text-lg transition-all duration-200 rounded-none shadow-none focus:ring-0 focus:border-ink-950;
   }
-  input[type="text"]:focus, select:focus, textarea:focus {
-    @apply border-ink-950 outline-none ring-0 bg-ink-50/30;
-  }
-  /* Custom glass effect for pipeline */
-  .pipeline-card {
-    backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.8);
+  form textarea {
+    min-height: 120px;
   }
 </style>
 {% endblock %}

@@ -1,0 +1,11 @@
+<div class="border-l-2 border-ink-200 pl-5 pt-6 mt-6 first:border-0 first:pt-0 first:mt-0" _="on load transition my opacity from 0 to 1 over 300ms, my translateY from 10px to 0 over 300ms">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="font-body font-semibold text-ink-900 text-sm">{{ comment.author_name }}</span>
+    <span class="text-ink-300 font-mono text-[10px]">|</span>
+    <span class="font-mono text-[10px] text-ink-400">Just now</span>
+    <span class="bg-ink-100 text-ink-500 font-mono text-[9px] uppercase tracking-widest px-1 py-0.5 ml-auto">Awaiting Moderation</span>
+  </div>
+  <div class="font-body text-sm text-ink-700 leading-relaxed whitespace-pre-wrap">
+    {{ comment.body }}
+  </div>
+</div>
